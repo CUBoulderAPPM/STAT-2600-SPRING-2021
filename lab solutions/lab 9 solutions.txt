@@ -1,0 +1,181 @@
+---
+title: "Lab 9 Solutions"
+author: "Osita Onyejekwe"
+date: ""
+output: 
+  html_document:
+    fig_width: 7
+    fig_height: 5
+---
+
+##### Remember to change the `author: ` field on this Rmd file to your own name.
+
+We'll begin by loading some packages.
+```{r}
+library(tidyverse)
+Cars93 <- as_tibble(MASS::Cars93)
+```
+
+### Testing 2 x 2 tables
+
+Doll and Hill's 1950 article studying the association between smoking and lung cancer contains one of the most important 2 x 2 tables in history.  
+
+Here's their data:
+
+```{r}
+smoking <- as.table(rbind(c(688, 650), c(21, 59)))
+dimnames(smoking) <- list(has.smoked = c("yes", "no"),
+                    lung.cancer = c("yes","no"))
+smoking
+```
+
+**(a)** Use `fisher.test()` to test if there's an association between smoking and lung cancer.
+
+```{r}
+smoking.fisher.test <- fisher.test(smoking)
+smoking.fisher.test
+```
+
+**(b)** What is the odds ratio?  Interpret this quantity.
+
+```{r}
+smoking.fisher.test$estimate
+```
+
+This says that the odds of having lung cancer are `r round(smoking.fisher.test$estimate, 2)` times higher among smokers than non-smokers.  
+
+**(c)** Are your findings statistically significant?
+
+```{r}
+smoking.fisher.test$p.value
+```
+
+The findings are highly statistically significant.  
+
+### Plotting error bars
+
+Using Doll and Hill's smoking data and, construct a bar graph with accompanying error bars showing the proportion of study participants with lung cancer in each smoking status group. 
+
+To succeed in this exercise, you'll want to follow along careful with the lecture notes.  Please read the section titled "Plotting the table values with confidence".
+
+```{r}
+# Reshape the count table into a tibble:
+smoking.tbl <- as_tibble(smoking)
+
+# Add a column showing total count in each (smoking status) group
+smoking.tbl <- smoking.tbl %>%
+  group_by(has.smoked) %>%
+  mutate(total = sum(n)) %>%
+  filter(lung.cancer == "yes")  # Retain only the lung.cancer = yes rows
+
+smoking.toplot <- smoking.tbl %>%
+  group_by(has.smoked) %>%
+  summarize(prop = n / total,
+            lower = prop.test(n, total)$conf.int[1],
+            upper = prop.test(n, total)$conf.int[2])
+
+# Here's our summary table
+smoking.toplot
+
+# Plotting routine
+smoking.toplot %>%
+  ggplot(aes(x = has.smoked, fill = has.smoked, y = prop)) +
+  geom_bar(position="dodge", stat="identity") +
+  geom_errorbar(aes(ymin=lower, ymax=upper), 
+                width=.2,                    # Width of the error bars
+                position=position_dodge(0.9)) + 
+  ylab("Proportion with lung cancer")
+```
+
+### ANOVA with birthwt data
+
+Let's form our favourite birthwt data set.
+
+```{r}
+# Import data, rename variables, and recode factors all in one set of piped 
+# commands
+birthwt <-  as_tibble(MASS::birthwt)  %>%
+  rename(birthwt.below.2500 = low, 
+         mother.age = age,
+         mother.weight = lwt,
+         mother.smokes = smoke,
+         previous.prem.labor = ptl,
+         hypertension = ht,
+         uterine.irr = ui,
+         physician.visits = ftv,
+         birthwt.grams = bwt) %>%
+  mutate(race = recode_factor(race, `1` = "white", `2` = "black", `3` = "other")) %>%
+  mutate_at(c("mother.smokes", "hypertension", "uterine.irr", "birthwt.below.2500"),
+            ~ recode_factor(.x, `0` = "no", `1` = "yes"))
+```
+
+
+
+**(a)** Create a new factor that categorizes the number of physician visits into four levels: 0, 1, 2, 3 or more.  
+
+```{r}
+birthwt <- birthwt %>%
+  mutate(physician.visits.binned = recode_factor(physician.visits,
+    `0` = "0",
+    `1` = "1",
+    `2` = "2",
+    .default = "3 or more"
+  ))
+```
+
+**Hint**: One way of doing this is with `recode` by specifying `.default = "3 or more"`.  Have a look at the help file for `recode` to learn more.  
+
+**(b)** Run an ANOVA to determine whether the average birth weight varies across number of physician visits.  Interpret the results.
+
+```{r}
+summary(aov(birthwt.grams ~ physician.visits.binned, data = birthwt))
+```
+
+We find that there is no statistically significant variation in average birthweigh across different levels of the number of first trimester physician visits.
+
+### Linear regression with Cars93 data
+
+Below is figure showing how Price varies with EngineSize in the Cars93, with accompanying regression lines.  There are two plots, one for USA cars, and one for non-USA cars.
+
+```{r, fig.align='center', fig.height = 4}
+qplot(data = Cars93, x = EngineSize, y = Price, colour = Origin) + 
+  facet_wrap("Origin") + 
+  stat_smooth(method = "lm") + 
+  theme(legend.position="none")
+```
+
+**(a)** Use the `lm()` function to regress Price on EngineSize and Origin
+
+```{r}
+cars.lm <- lm(Price ~ EngineSize + Origin, data = Cars93)
+
+summary(cars.lm)
+```
+
+**(b)** Run `plot()` on your `lm` object.  Do you see any problems?
+
+```{r, fig.width = 6, fig.height = 7}
+par(mfrow = c(2,2))
+plot(cars.lm)
+```
+
+The residual plot shows a clear sign of non-constant variance.  (The plot looks like a funnel, with variance increasing with fitted value.)  One can also see this from the upward slope evidence from the the scale-location plot.
+
+**(c)** Try running a linear regression with `log(Price)` as your outcome.
+
+```{r}
+cars.lm.log <- lm(log(Price) ~ EngineSize + Origin, data = Cars93)
+
+summary(cars.lm.log)
+```
+
+**(d)** Run `plot()` on your new `lm` object.  Do you see any problems?
+
+```{r, fig.width = 6, fig.height = 7}
+par(mfrow = c(2,2))
+plot(cars.lm.log)
+```
+
+The variance now looks pretty constant across the range of fitted values, and there don't appear to be any clear trends in the plots.  All of the diagnostic plots seem pretty good.  It looks like the log transformation helped.
+
+ 

@@ -1,0 +1,100 @@
+---
+title: "Lab 4"
+author: "Your Name Here"
+output: html_document
+---
+
+##### Remember to change the `author: ` field on this Rmd file to your own name.
+
+### Learning objectives
+
+> In today's Lab you will gain practice with the following concepts from Lecture 4:
+
+>- Using **loops** to iterate through a data set
+- Alternatives to loops such as the **`apply`** apply
+- Using the various **`summarize`** commands to produce simple tabular summaries, and interpreting the results
+
+## Problems
+
+```{r}
+library(tidyverse)
+Cars93 <- as_tibble(MASS::Cars93)  # Pull Cars93 from MASS
+```
+
+### 1. Loop practice
+
+**(a)** Write a function called `calculateRowMeans` that uses a **for loop** to calculate the row means of a matrix `x`.
+
+```{r}
+# Edit me
+```
+
+**(b)** Try out your function on the random matrix `fake.data` defined below.
+
+```{r}
+set.seed(12345) # Set seed of random number generator
+fake.data <- matrix(runif(800), nrow=25)
+```
+
+**(c)** Use the `apply()` function to calculate the row means of the matrix `fake.data`
+
+```{r}
+# Edit me
+```
+
+**(d)** Compare this to the output of the `rowMeans()` function to check that your calculation is correct.
+
+```{r}
+# Edit me
+```
+
+
+
+### 2. summarize() practice
+
+**(a)** Use `group_by()` and  `summarize()` commands on the Cars93 data set to create a table showing the average `Turn.circle` of cars, broken down by vehicle `Type` and `DriveTrain`
+
+```{r}
+# Edit me
+```
+
+
+**(b)** Are all combinations of Type and DriveTrain shown in the table?  If not, which ones are missing?  Why are they missing?
+
+> Replace this text with your solution.
+
+**(c)** Add the argument `.drop = FALSE` to your `group_by` command, and then re-run your code. What happens now?
+
+```{r}
+# Edit me
+```
+
+> Replace this text with your solution.
+
+**(d)** Having a car with a small turn radius makes city driving much easier.  What Type of car should city drivers opt for?
+
+> Replace this text with your solution.
+
+**(e)** Does the vehicle's `DriveTrain` appear to have an impact on turn radius?  
+
+> Replace this text with your solution.
+
+### 3. map() and _at() practice
+
+**(a)** The `nlevels` command tells you the number of levels in a factor variable.  Use this function in combination with `summarize_if()` to produce an integer vector showing the number of levels for each factor variables in the Cars93 data.
+
+```{r}
+# Edit me
+```
+
+**(b)** `levels()` returns the possible levels of a factor variable. Use this function in combination with `select` and `map` to create a list of all the levels of the Manufacturer, AirBags, DriveTrain, and Man.trans.avail variables
+
+```{r}
+# Edit me
+```
+
+**(c)** Use the `toupper()` command in combination with `mutate_if()` to produce a new version of Cars93 where every factor variable has been converted to upper case.  
+
+```{r}
+# Edit me
+```

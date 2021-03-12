@@ -1,0 +1,162 @@
+---
+title: "Homework 4"
+author: "Your name here"
+date: 'Assigned: February 8, 2018'
+output: 
+  html_document:
+    theme: paper
+    highlight: tango
+    toc: true
+    toc_depth: 3
+    fig_width: 5
+    fig_height: 5
+---
+
+### Homework outline
+
+This homework is designed to give you practice with calculating error bars (confidence intervals) with ddply and using ggplot2 graphics to produce insightful plots of the results.  
+
+
+```{r, message = FALSE}
+library(plyr)
+library(dplyr)
+library(ggplot2)
+```
+
+You will continue using the `adult` data set that you first encountered on Homework 3.  This data set is loaded below.
+
+```{r}
+adult.data <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data", header=FALSE, fill=FALSE, strip.white=T,
+                 col.names=c("age", "type_employer", "fnlwgt", "education", 
+                "education_num","marital", "occupation", "relationship", "race","sex",
+                "capital_gain", "capital_loss", "hr_per_week","country", "income"))
+adult.data <- mutate(adult.data,
+                     high.income = as.numeric(income == ">50K"))
+```
+
+
+### Problem 1: Calculating and plotting error bars for a 1-sample t-test 
+
+#### (a)  Using `ddply` and 1-sample t-testing, construct a table that shows the average `capital_gain` across `education`, along with the lower and upper endpoints of a 95% confidence interval.  Your table should look something like:
+
+```
+      education       mean       lower      upper
+1          10th   404.5745   91.893307   717.2557
+2          11th   215.0979  144.306937   285.8888
+3          12th   284.0878  126.824531   441.3510
+...
+```
+
+```{r}
+# Edit me
+```
+
+#### (b) Reorder the levels of the factor in your summary table to correspond to ascending order of education.  E.g., Preschool is the lowest, 1st-4th the next lowest, etc.  You may find the `factor(..., levels = ...)` command helpful here.  For the post-high school grades, you can use the ordering:  Assoc-voc, Assoc-acdm, Some-college, Bachelors, Masters, Prof-school, Doctorate.  
+
+```{r}
+# Edit me
+
+```
+
+### Problem 2: (Continuing from Problem 1)
+
+#### (a) Using your table from Problem 1(b) Construct a bar chart showing education on the x-axis, and the average capital gainst on the y axis.  Use `geom_errorbar` to overlay error bars as specified by the confidence interval endpoints you computed.  You should tilt your x-axis text to limit overlap of x-axis labels.  Set an appropriate y-axis label.
+
+```{r}
+# Edit me
+```
+
+#### (b) What can you conclude about the association between capital gains and education levels?  Does there appear to be a statistically significant difference in capital gains across education?
+
+<font color="#0033cc">
+
+Your answer goes here!
+
+</font>
+
+
+### Problem 3: Two-sample t-test error bars.
+
+#### (a) [3 points]  Using `ddply` and 2-sample t-testing, construct a table that shows the difference in the proportion of men and women earning above 50K across different employer types.  E.g., if 20% of men and 15% of women in a group earn about 50K, the difference in proportion is 0.2 - 0.15 = 0.05.   Your table should use the 2-sample t-test to also calculate the lower and upper endpoints of a 95% confidence interval.  (While a t-test isn't appropriate for binary data when the number of observations is small, we'll ignore this issue for now.)  Your table should look something like:
+
+```
+     type_employer  prop.diff     lower     upper
+1                ? 0.07743971 0.0504165 0.1044629
+2      Federal-gov 0.31059432 0.2532462 0.3679424
+3        Local-gov 0.18361338 0.1461258 0.2211009
+...
+```
+
+```{r}
+# Edit me
+```
+
+#### (b) Your table will have some fields that have the value NaN for the error bar limits.  Explain why this is happening.
+
+<font color="#0033cc">
+
+Your answer goes here!
+
+</font>
+
+#### (c) Subset your summary table to include just those rows for which you have valid calculated values of the difference in high earning proportion and the upper and lower confidence intervals.  You will find the `is.nan` function useful here.
+
+```{r}
+# Edit me
+```
+
+### Problem 4: Problem 3 (continued)
+
+#### (a) Using your table from  3(c) construct a bar chart showing employer type on the x-axis, and the difference in high earning rates between men and women on the y axis.  Use `geom_errorbar` to overlay error bars as specified by the confidence interval endpoints you computed.  You should tilt your x-axis text to limit overlap of x-axis labels.  Set an appropriate y-axis label.
+
+```{r}
+# Edit me
+```
+
+#### (b) Reorder your x-axis variable in ascending order of high earning rate gap.  You may find it useful to recall the `reorder` command from Lecture 7.  Display the plot with the re-ordered x-axis variable.  
+
+```{r}
+# Edit me
+```
+
+#### (c) [2 points] Are there any employer types where women have higher rates of being high earners compared to men?  Are there any employer types where the high earning rates appear to not be statistically significantly different between men and women?
+
+<font color="#0033cc">
+
+Your answer goes here!
+
+</font>
+
+#### (d) Which employer types appear to have the greatest disparity in high earning rates between men and women?
+
+<font color="#0033cc">
+
+Your answer goes here!
+
+</font>
+
+### Problem 5: Coloring by statistical significance
+
+#### (a) Repeat part 1(a), this time adding an additional statistical significance indicator column that is 0 if the confidence interval overlaps 0 and is 1 otherwise.  Your table should look something like:
+
+```
+      education       mean       lower      upper is.signif
+1          10th   404.5745   91.893307   717.2557         1
+2          11th   215.0979  144.306937   285.8888         1
+3          12th   284.0878  126.824531   441.3510         1
+4       1st-4th   125.8750    5.656611   246.0934         1
+5       5th-6th   176.0210   74.643760   277.3983         1
+6       7th-8th   233.9396  154.388060   313.4912         1
+7           9th   342.0895  -44.104225   728.2832         0
+...
+```
+
+```{r}
+# Edit me
+```
+
+#### (b) Repeat 1(b) to reorder education to be in ascending order of educational attainment.  Then repeat 2(a) to produce a bar chart with error bars, specifying this time that the fill of the bars should be determined by whether the average gains are statistically significantly different from 0.
+
+```{r}
+# Edit me
+```

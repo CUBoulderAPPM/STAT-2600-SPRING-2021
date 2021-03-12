@@ -1,0 +1,520 @@
+---
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+
+# Analysis of the cars data set in R 
+## by Osita Onyejekwe 
+
+**Part 1** 
+
+```{r}
+data(cars)
+str(cars)
+summary(cars)
+plot(cars)
+```
+**Part 2**
+```{r}
+hist(cars$speed)
+boxplot(cars$speed)
+```
+The mean speed of the car is `r mean(cars$speed)`
+
+```
+hello i can't wait for the patriots to win the next superbowl 
+```
+**Part 3: Data Import**
+
+```{r}
+survey<- read.csv('/Users/osita/OneDrive/Desktop/STAT 2600 SPRING 2021/Coding/survey_data2020.csv')
+class(survey)
+head(survey, 3)
+
+```
+
+```{r}
+survey<- read.csv('/Users/osita/OneDrive/Desktop/STAT 2600 SPRING 2021/Coding/survey_data2020.csv')
+class(survey)
+head(survey,3)
+
+```
+
+
+# Lecture 2 Day 2
+## STAT 2600
+
+**Part 1: Simple Summary **
+
+Use the **str()** function to get a simple summary of your data frame object 
+
+```{r}
+str(survey)
+
+```
+
+Factor refers to categorical data wherease TVhours is a numerica variable 
+
+```{r}
+summary(survey)
+```
+
+
+**Data Frame Basics**
+
+Lists, and data frames (and their "tidy" variants)---> next week but for now some basics 
+Goal here is to observe what an R object is made up off, using **attributes()
+
+```{r}
+attributes(survey)
+```
+
+An R **data frame** is a list whose columns can refer to by name or index 
+When you see $ symbol it tells you that it's a list of some kind 
+
+
+**Data Frame Dimensions 
+
+We use **nrow()** and **ncol** to determine the number of survey responses and the number of survey questions 
+
+
+```{r}
+nrow(survey) # number of rows (responses)
+
+```
+
+```{r}
+ncol(survey) # number of columns (questions)
+
+```
+
+`r nrow(survey)`
+
+We collected data on `r ncol(survey)` survey questions from `r nrow(survey)` respondents. 
+Respondents represnted `r length(unique(survey[["Program"]]))` CU programs. 
+`r sum(survey[["Program"]]=="PPM")` of the respondents were from PPM
+
+We collected data on 6 survey questions from 57 repondents. Respondents represented 3 CU programs. 38 of the respondents were from PPM
+
+
+
+# Lecture 2 Day 3
+## STAT 2600
+
+
+**Indexing rows and columns**
+
+* Data frames have two dimensions to index across 
+* You can use square bracket notation **df[rows,cols]** to extract specifed `rows` and `cols` 
+  from a data frame `df`
+* There are also other approaches, as illustrated below 
+
+```{r}
+survey[6,5]    # row 6, column 5
+
+```
+
+
+
+
+```{r}
+survey[6, "Program"]  # Program of 6th survey respondent 
+
+```
+
+
+
+
+```{r}
+
+survey[["Program"]][6]   # Program of 6th survey respodent 
+
+```
+
+
+**Indexing data frames**
+
+* There are many diferrent ways of indexing the same piece of a data frame 
+ + Each vector below contains 57 enteries. 
+
+```{r}
+survey[["Program"]]   # "Program" element 
+```
+
+
+
+```{r}
+survey$Program    # "Program" element 
+
+```
+
+
+```{r}
+survey[,1]      # Data from 1st Column 
+
+```
+
+
+
+**More Indexing** 
+
+* Note that single brackets and double brackets have different effects 
+
+```{r}
+survey[["Program"]]   # Returns the program column as a vector 
+
+```
+
+
+```{r}
+
+survey["Program"]  # single column data frame containing "Program"
+
+```
+
+**Bar Plot (categorical)**
+Here we'll use **qplot()** from the `ggplot2` library (part of `tidyverse`)
+
+
+```{r}
+library(ggplot2)
+qplot(survey$Program)
+```
+
+**Histogram (continuous data)**
+
+Here we'll use **qplot()** from the `ggplot2` library (part of `tidyverse`)
+
+```{r}
+library(ggplot2)
+qplot(survey[["TVhours"]], binwidth=3, fill= I("steelblue"))
+
+```
+
+
+```{r}
+# Looking at data from the 1st and 5th column 
+
+survey[, c(1,5)]
+
+```
+
+
+
+```{r}
+
+# We can also look at data from "Program" and "Editor"
+
+survey[c("Program", "Editor")]
+
+```
+
+** tidy column selection: select()**
+
+It is preferable to use the **select()** function to select subsets of columns 
+```{r}
+library(dplyr)
+select(survey, Program, Editor)
+```
+
+**More indexing rows and columns** 
+
+* If you leave, e.g, the `rows` value blank in **df[rows, cols]**, it will pull all the rows 
+for the specified `cols`
+* leaving `cols` blank pulls all the columns for the specified `rows`
+
+```{r}
+survey[6,]   # 6th row 
+
+```
+
+
+```{r}
+survey[,2]  # 2nd column 
+
+```
+
+**More indexing**
+
+In lab 1 you were introduced to the colon operator : 
+We can use this operator for indexing
+
+```{r}
+survey[1:3, ]    # equivalent to head(survey, 3)
+
+```
+
+
+```{r}
+survey[3:5, c(1,5)]
+
+```
+
+**Subsets of data**
+We are often interested in learning something specific about a subset of the data 
+
+```{r}
+survey[survey$Program == "MISM", ]  # data from the MISM students 
+survey[which(survey$Program == "MISM"), ]  # Does the same thing 
+
+```
+
+**More subset examples**
+* Pulling the PPM students who have never used R before 
+```{r}
+survey[survey$Program =="PPM"  & survey$Rexperience== "Never used", ]
+
+```
+
+**"tidy" subsetting with `filter()`**
+
+* In general, it is preferable to use the `filter()` function 
+
+* Here is an example of selecting all responses from students who are either in PPM or Other 
+and who listed their R experience as "Basic competence".
+
+```{r}
+filter(survey, (Program == "PPM" | Program == "Other") & Rexperience == "Basic competence")
+
+```
+
+`filter()` allows you to split conditions across lines 
+* On the previous code chunk, we had 
+
+
+```{r}
+filter(survey, (Program == "PPM" | Program == "Other") & Rexperience == "Basic competence")
+```
+
+* This is equivalent to the easier parse to call 
+
+```{r}
+filter(survey, (Program == "PPM" | Program == "Other") &
+         Rexperience == "Basic competence")
+```
+
+**"tidy" selection of rows and columns 
+* What if we wanted to select a subset of rows and columns with a combination of `filter` and `select`? 
+* Here's one strategy 
+
+```{r}
+
+# First we get the desired rows 
+row.subset<- filter(survey, Program == "PPM"  | Program == "Other",
+                    Rexperience == "Basic competence")
+
+# then, get the right columns 
+
+select(row.subset, TVhours, Editor)
+
+
+```
+
+
+**Piping with %>%**
+
+* Here's a better strategy, which uses "piping" to supply the output of one computation as an argument into the next 
+* Most of our data processing/summarization pipelines in R will invovle lots of piping 
+* The symbol `%>%` is pronounced "pipe""
+
+
+```{r}
+# First we get the desired rows 
+filter(survey,
+                 Program == "PPM"  | Program == "Other",
+                    Rexperience == "Basic competence") %>%
+select(TVhours, Editor)
+
+```
+
+**Piping: Preferred style 
+* When piping, it's best to pipe right from the start 
+
+
+```{r}
+# OK:
+filter(survey,
+                 Program == "PPM"  | Program == "Other",
+                    Rexperience == "Basic competence") %>%
+select(TVhours, Editor)
+
+
+```
+
+```{r}
+# BETTER:  
+survey %>%
+                 filter(Program == "PPM"  | Program == "Other",
+                    Rexperience == "Basic competence") %>%
+select(TVhours, Editor)
+
+```
+
+**Splitting a long expression**
+
+* As your function calls get longer and more complicated, you may find it useful to split
+them over muliple lines 
+
+* Supose you had something like this 
+"
+```{r}
+survey[(survey$Program =="PPM"  | survey$Program == "Other")  & survey$Rexperience ==  "Basic competence",  ]
+
+```
+
+* You can split this across multiple lines by putting a linke break **after** an operator 
+
+```{r}
+survey[(survey$Program =="PPM"  | survey$Program == "Other")  &
+         survey$Rexperience ==  "Basic competence",  ]
+```
+
+
+* Note that the line break occurs after the `&` operator 
+
+```{r}
+survey[(survey$Program =="PPM"  | survey$Program == "Other")  &
+         survey$Rexperience ==  "Basic competence",  ]
+```
+
+* Some simple calcuations 
+
+
+```{r}
+mean(survey$TVhours[survey$Program == "PPM"]) # Average Time PPM's spent watching TV 
+mean(survey$TVhours[survey$Program == "MISM"]) # Average Time PPM's spent watching TV 
+mean(survey$TVhours[survey$Program == "Other"]) # Average Time PPM's spent watching TV 
+
+```
+
+
+** (Preview of) "tidy" data summaries with `group_by` and `summarize` 
+
+* Here's a much easier and cleaner way of getting the average TV Hours watched by students 
+in each program. We use `group_by` and `summarize` 
+
+
+```{r}
+survey %>%
+  group_by(Program) %>%
+ summarize(mean(TVhours))
+
+```
+
+** Defining variables **
+
+* If we wanted to focus on a particular column of the data frame, we could always define 
+it as a new variable  (e.g if you want to easily experiment on a column)
+
+
+```{r}
+tv.hours <- survey$TVhours # Vector f TVhours watched 
+mean(tv.hours)
+
+```
+
+```{r}
+sd(tv.hours)   # Standard deviation of TV watching time 
+
+```
+
+```{r}
+sum(tv.hours >= 5)   # How many poeple watched 5 or more hours of Tv?
+
+```
+
+
+**Enforced style: assignment operator **
+
+**Assignement Operator**. Use `<-` instead of `=`
+* stlye guides uniformly promote the use of `<-` instead of `=` as the assignment operator
+
+```{r}
+#Good 
+student.names <- c("Wyett", "Taryn", "Anthony")
+
+```
+
+```{r}
+#Bad
+student.names = c("Wyett", "Taryn", "Anthony")
+
+```
+
+
+* Use `=` when specifying function arguments, 
+
+```{r}
+sort(tv.hours, decreasing = TRUE)  # good 
+
+```
+
+```{r}
+sort(tv.hours, decreasing <- TRUE)  # bad
+
+```
+
+
+** Enforced style: Spacing **
+* Binary operators should have spaces around them 
+* Commas should have space after, but not before (just like writting)
+
+
+```{r}
+3 * 4 # good 
+3*4   # bad 
+
+which(student.names == "Anthony")  # Good 
+which(student.names== "Anthony")  #  Bad
+
+```
+
+
+* For specifying arguments, spacing around `=` is optional 
+
+
+```
+sort(tv.hours, decreasting= TRUE)  # Accepted 
+sort(tv.hours, decreasting = FALSE)  # Accepted 
+
+```
+
+
+**Enforced style: Variable Names**
+
+* To make code easy to read, debug and maintain, you should use **concise** but **descriptive**
+variable names
+* Terms in variable names should be seperaed by `_` or `.`
+
+
+```
+# Accepted 
+
+day_one     day.one    day_1   day1 
+
+#bad 
+
+d1    DayOne   dayone 
+
+# can be made more concise 
+
+
+first.day.of.the.month
+
+
+```
+
+* Avoid using variable names that are arleady pre-defined variables of functions in R 
+
+```
+Extremely bad 
+
+
+c    T     pi     sum    mean   # NO BUENO 
+
+```
+
+

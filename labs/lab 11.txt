@@ -1,0 +1,82 @@
+---
+title: "Lab 11"
+author: "Your Name Here"
+date: ""
+output: html_document
+---
+
+##### Remember to change the `author: ` field on this Rmd file to your own name.
+
+### Learning objectives
+
+> In today's Lab you will gain practice with the following concepts from today's class:
+
+>- Interpreting linear regression coefficients of numeric covariates
+- Interpreting linear regression coefficients of categorical variables
+- Fitting linear regression models with interaction terms
+- Interpreting linear regression coefficients of interaction terms
+
+We'll begin by loading some packages and importing the data.
+```{r}
+library(tidyverse)
+```
+
+```{r, echo = FALSE}
+# Load data from MASS into a tibble and do pre-processing
+birthwt <- as_tibble(MASS::birthwt) %>%
+  rename(birthwt.below.2500 = low, 
+         mother.age = age,
+         mother.weight = lwt,
+         mother.smokes = smoke,
+         previous.prem.labor = ptl,
+         hypertension = ht,
+         uterine.irr = ui,
+         physician.visits = ftv,
+         birthwt.grams = bwt) %>%
+  mutate(race = recode_factor(race, `1` = "white", `2` = "black", `3` = "other")) %>%
+  mutate_at(c("mother.smokes", "hypertension", "uterine.irr", "birthwt.below.2500"),
+            ~ recode_factor(.x, `0` = "no", `1` = "yes"))
+```
+
+### Interaction terms in regression
+
+
+**(a)** Run a linear regression to better understand how birthweight varies with the mother's age and smoking status (do not include interaction terms).
+
+```{r}
+# Edit me
+```
+
+**(b)** What is the coefficient of mother.age in your regression?  How do you interpret this coefficient?
+
+```{r}
+# Edit me
+```
+
+**(c)** How many coefficients are estimated for the mother's smoking status variable?  How do you interpret these coefficients?
+
+```{r}
+# Edit me
+```
+
+**(d)** What does the intercept mean in this model?
+
+**(e)** Using ggplot, construct a scatterplot with birthweight on the y-axis and mother's age on the x-axis.  Color the points by mother's smoking status, and add smoking status-specific linear regression lines using the `stat_smooth` layer.
+
+```{r}
+# Edit me
+```
+
+**(f)** Do the regression lines plotted in part (e) correspond to the model you fit in part (a)?  How can you tell?
+
+**(g)** Fit a linear regression model that now models potential interactions between mother's age and smoking status in their effect on birthweight.
+
+```{r}
+# Edit me
+```
+
+**(h)** Interpret your model.  Is the interaction term statistically significant?  What does it mean?
+
+```{r}
+# Edit me
+```

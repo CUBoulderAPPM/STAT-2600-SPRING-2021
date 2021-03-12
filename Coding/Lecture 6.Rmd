@@ -1,0 +1,540 @@
+---
+title: Lecture 6 - tibbles, data manipulation and introduction to graphics
+author: Dr. Osita Onyejekwe 
+date: ""
+output: 
+  html_document:
+    theme: simplex
+    highlight: tango
+    fig_height: 5
+    fig_width: 7
+  ioslides_presentation:
+    highlight: tango
+    widescreen: true
+    smaller: true
+---
+
+### Agenda
+
+- tibbles
+- Introduction to R graphics (ggplot2)
+
+###  Packages
+```{r}
+library(tidyverse)
+library(knitr)
+```
+
+### Getting started: birthwt dataset 
+- We're going to start by operating on the `birthwt` dataset from the MASS library
+
+- Let's get it loaded and see what we're working with.  Remember, loading the MASS library overrides certain tidyverse functions.  We don't want to do that.  So when we need something from MASS we'll extract that dataset or function directly.  
+
+```{r}
+
+birthwt.df <- MASS::birthwt
+
+```
+
+### tibbles
+- `tibbles` are nicer data frames
+- You may find it more convenient to work with tibbles instead of data frames
+- In particular, they have nicer and more informative default print settings
+- The `dplyr` functions we've been using are very nice because they map tibbles to other tibbles.  
+
+```{r}
+
+birthwt <- as_tibble(birthwt.df)
+birthwt
+
+```
+
+```{r}
+# Compare to the printout for a data frame
+
+birthwt.df
+```
+
+- There are a few ways in which operations on tibbles behave differently from operations on data frames.  This occurs, for instance, with certain types of indexing:
+
+```{r}
+# The following two operations produce the same result
+birthwt.df$age
+
+birthwt$age
+
+```
+
+```{r}
+# But these operations do not:
+
+# Return a single value (vector of length 1)
+
+#birthwt.df[1,2]
+
+# Returns a tibble
+
+#birthwt[1,2]
+
+
+# Forcing tibble operations to return just the value:
+
+
+birthwt[1,2, drop=TRUE]
+```
+
+> **Note**: If you want to import data directly into `tibble` format, you may use `read_delim()` and `read_csv()` instead of their base-R alternatives.  Even though we started with the base alternatives, I recommend using these improved import commands going forward.  
+
+### Renaming the variables
+- The dataset doesn't come with very descriptive variable names
+
+- Let's get better column names (use `help(birthwt)` to understand the variables and come up with better names)
+
+```{r}
+colnames(birthwt)
+
+# the dolumn names are not very descripting 
+
+colnames(birthwt)<- c("birthwt.below.2500", "mother.age", "mother.weight", "race", "mother.smokes",
+                      "previous.prem.labor", "hypertension", "uterine.irr", "physician.visits",
+                      "birthwt.grams")
+
+# better names! 
+birthwt
+
+```
+
+### An alternative renaming approach: the `rename()` command
+
+`rename` operates by allowing you to specify a new variable name for whichever old variable name you want to change.
+
+```{r, eval = FALSE}
+rename(new variable name = old variable name)
+```
+
+```{r}
+# Reload the data again
+birthwt<- as_tibble(MASS::birthwt)
+
+birthwt<- birthwt %>%
+  rename(birthwt.below.2500= low,
+         mother.age= age,
+         mother.weight = lwt,
+         mother.smokes= smoke,
+         previous.prem.labor= ptl,
+         hypertension= ht,
+         uterine.irr= ui,
+         physician.visits= ftv,
+         birthwt.grams=bwt)
+
+colnames(birthwt)
+birthwt
+
+```
+
+Note that in this command we didn't rename the race variable because it already had a good name.
+
+### Renaming the factors
+- All the factors are currently represented as integers
+
+- Let's use the `mutate()`, `mutate_at()` and `recode_factor()` functions to convert variables to factors and give the factors more meaningful levels 
+```{r}
+#birthwt
+
+birthwt<- birthwt %>%
+mutate(race = recode_factor(race, `1`= "white", `2` = "black" , `3` = "other")) %>%
+  mutate_at(c("mother.smokes", "hypertension", "uterine.irr", "birthwt.below.2500"),
+            ~ recode_factor(.x, `0`= "no", `1` ="yes") )
+
+birthwt
+
+```
+
+Recall that the syntax `~ recode_factor(.x, ...)` defines an anonymous function that will be applied to every column specfied in the first part of the `mutate_at()` call.  In this case, all of the specified variables are binary 0/1 coded, and are being recoded to no/yes.  
+
+### Summary of the data
+- Now that things are coded correctly, we can look at an overall summary
+
+```{r}
+summary(birthwt)  # this is good for data justfication and deeper insights especially when dealing with 
+# multiple sets of data and doing comparison / regression analysis 
+```
+
+### A simple table
+- Let's use the `summarize()` and `group_by()` functions to see what the average birthweight looks like when broken down by race and smoking status.  To make the printout nicer we'll round to the nearest gram.
+
+```{r}
+tbl.mean.bwt <- birthwt %>%
+group_by(race, mother.smokes) %>% 
+  summarize(mean.birthwt = round(mean(birthwt.grams, 0)))
+tbl.mean.bwt
+
+```
+
+- Questions you should be asking yourself:
+    - Does smoking status appear to have an effect on birth weight?
+    - Does the effect of smoking status appear to be consistent across racial groups?
+    - What is the association between race and birth weight?
+    
+### A simple reshape
+
+- Some of these questions might be easier if we had the data in a wide rather than a long format.  Here's how we can do that with the `pivot_wider()` function from `tidyr`
+- In previous versions of `tidyr` this would have been achieved through the `spread()` function
+  - `spread()` still works, but the new preferred call is to `pivot_wider()`
+- To use `pivot_wider()` for this type of reshaping, we'll want to specify the `data`, `names_from` and `values_from`:
+
+```{r}
+tbl.mean.bwt %>% 
+  pivot_wider(names_from = mother.smokes, values_from=mean.birthwt)
+
+```
+
+### What if we wanted nicer looking output?
+- Let's use the header `{r, results='asis'}`, along with the `kable()` function from the `knitr` library
+
+- We could save the table from our previous computation and then run `kable` on it directly with a `kable(x, format)` command.  Or, we can take our table code from before, and pipe it into a kable command.
+  - Either approach is fine
+
+```{r, results='asis'}
+# Print nicely
+
+tbl.mean.bwt %>%
+  pivot_wider(names_from = mother.smokes, values_from = mean.birthwt) %>%
+  kable(format = "markdown")
+
+# Wednesdays class " Pearson's Correlation Coeficient" : Explained Variance and 
+# strenght of association     y  ~ x---> independent variable 
+```
+
+- `kable()` outputs the table in a way that Markdown can read and nicely display
+
+- Note: changing the CSS changes the table appearance
+
+### Example: Association between mother's age and birth weight?
+- Is the mother's age correlated with birth weight?
+
+```{r}
+
+cor(birthwt$mother.age, birthwt$birthwt.grams)   # Calculate our correlation
+
+# this resembles a weak correlation 
+
+```
+
+- Does the correlation vary with smoking status?
+
+```{r}
+
+# smoking status means in terms of smokers and non smokers
+
+# note that the negative is not indicative of a weak correlation but rather an inverse 
+# relationship that could either be strong or weak 
+
+birthwt %>% 
+  group_by(mother.smokes) %>%
+  summarize(cor_bwt_age = cor(birthwt.grams, mother.age))
+
+# we should have a 2x2 matrix output 
+
+
+```
+
+### Does the association between birthweight and mother's age vary by race?
+
+```{r}
+
+birthwt %>% 
+  group_by(race) %>%
+summarize(cor_bwt_age = cor(birthwt.grams, mother.age))
+
+# i should get a 3x2 matrixs due to there being 3 categoeis for race (B,W, O and two colums for 
+# race and cor_bwt_age)
+
+```
+There does look to be variation, but we don't know if it's statistically significant without further investigation.  
+
+
+### Graphics in R
+- We now know a lot about how to tabulate data
+
+- It's often easier to look at plots instead of tables
+
+- We'll now talk about some of the standard plotting options
+
+
+
+### Standard graphics in R
+
+#### Single-variable plots
+
+Let's continue with the `birthwt` data from the `MASS` library.
+
+Here are some basic single-variable plots.
+
+```{r, fig.height = 7, fig.align='center'}
+par(mfrow = c(2,2))  # Display plots in a single 2x2 figure 
+plot(birthwt$mother.age)  # scatter plot 
+with(birthwt, hist(mother.age))
+plot(birthwt$mother.smokes)   # categorical (yes/no on x axis) and frequency (y axis)
+plot(birthwt$birthwt.grams)    # x axis will be an index and y axis will be birthwt in grams
+```
+
+Note that the result of calling `plot(x, ...)` varies depending on what `x` is.  
+    - When `x` is *numeric*, you get a plot showing the value of `x` at every index.  
+    - When `x` is a *factor*, you get a bar plot of counts for every level
+
+
+Let's add more information to the smoking bar plot, and also change the color by setting the `col` option.
+
+```{r, fig.height= 5, fig.width= 5, fig.align='center'}
+
+par(mfrow = c(1,1))
+plot(birthwt$mother.smokes,
+main = "Mothers Who Smoked in Pregnancy",
+xlab = "Smoking During Pregnancy",
+ylab = "Count of Mothers",
+col =   "brown")
+```
+
+###  (much) better graphics with ggplot2
+
+#### Introduction to ggplot2
+
+ggplot2 has a slightly steeper learning curve than the base graphics functions, but it also generally produces far better and more easily customizable graphics.  
+
+There are two basic calls in ggplot: 
+
+- `qplot(x, y, ..., data)`: a "quick-plot" routine, which essentially replaces the base `plot()`
+- `ggplot(data, aes(x, y, ...), ...)`: defines a graphics object from which plots can be generated, along with *aesthetic mappings* that specify how variables are mapped to visual properties.  
+
+```{r}
+library(ggplot2)
+```
+
+#### plot vs qplot
+
+Here's how the default scatterplots look in ggplot compared to the base graphics.  We'll illustrate things by continuing to use the birthwt data from the `MASS` library.
+
+```{r, fig.align='center', fig.height=3, fig.width=4}
+
+with(birthwt, plot(mother.age, birthwt.grams))  # Base graphics 
+qplot(mother.age, birthwt.grams, data=birthwt)  # using qplot from ggplot2
+
+```
+
+I've snuck the `with()` command into this example.  `with()` allows you to use the variables in a data frame directly in evaluating the expression in the second argument.
+
+Unlike base R graphics, which make things like legends a huge pain that requires a lot of manual work, `ggplot2` automatically produces reasonable (and also highly customizable) legends.  Here's an example.
+
+```{r, fig.align='center', fig.height=4, fig.width=5}
+
+qplot(x= mother.age, y = birthwt.grams, data=birthwt, 
+      color = mother.smokes, 
+      shape = mother.smokes ,
+      xlab = "Mother's age (years)",
+      ylab = "Baby's birthweight (grams)")
+```
+
+This way you won't run into problems of accidentally producing the wrong legend.  The legend is produced based on the `colour` and `shape` argument that you pass in.  (Note: `color` and `colour` have the same effect.)
+
+
+#### ggplot function
+
+The `ggplot2` library comes with a dataset called `diamonds`. Let's look at it
+```{r}
+#dim(diamonds)    # dim stands for dimension 
+head(diamonds)
+
+```
+It is a data frame of 53,940 diamonds, recording their attributes such as carat, cut, color, clarity, and price.
+
+We will make a scatterplot showing the price as a function of the carat (size). (The data set is large so the plot may take a few moments to generate.)
+
+```{r, fig.width=10, fig.height=4, dpi=70, cache=TRUE}
+diamond.plot <- ggplot(data = diamonds , aes(x = carat, y=price))
+diamond.plot + geom_point()   # this gives us a scatter plot 
+
+```
+
+The data set looks a little weird because a lot of diamonds are concentrated on the 1, 1.5 and 2 carat mark.  
+
+Let's take a step back and try to understand the ggplot syntax.  
+
+1) The first thing we did was to define a graphics object, `diamond.plot`.  This definition told R that we're using the `diamonds` data, and that we want to display `carat` on the x-axis, and `price` on the y-axis.  
+
+2) We then called `diamond.plot + geom_point()` to get a scatterplot.
+
+The arguments passed to `aes()` are called **mappings**.  Mappings specify what variables are used for what purpose.  When you use `geom_point()` in the second line, it pulls `x`, `y`, `colour`, `size`, etc., from the **mappings** specified in the `ggplot()` command.  
+
+You can also specify some arguments to `geom_point` directly if you want to specify them for each plot separately instead of pre-specifying a default.
+
+Here we shrink the points to a smaller size, and use the `alpha` argument to make the points transparent.
+
+```{r fig.width=10, fig.height=4, dpi=70, cache=TRUE}
+diamond.plot + geom_point(size = 0.7, alpha = 0.3)
+```
+
+If we wanted to let point color depend on the color indicator of the diamond, we could do so in the following way.
+
+```{r fig.width=10, fig.height=6, dpi=70, cache=TRUE}
+diamond.plot <- ggplot(data = diamonds , aes(x=carat , y= price, colour = color))
+diamond.plot + geom_point()
+
+```
+
+If we didn't know anything about diamonds going in, this plot would indicate to us that **D** is likely the highest diamond grade, while **J** is the lowest grade.
+
+We can change colors by specifying a different color palette.  Here's how we can switch to the `cbPalette`, which is one of the colorblind-friendly palettes most commonly used in R.  
+
+```{r fig.width=10, fig.height=6, dpi=70, cache=TRUE}
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+diamond.plot<- ggplot(data=diamonds, aes(x = carat, y = price, colour = color))
+diamond.plot + geom_point() + scale_colour_manual(values=cbPalette)
+
+```
+
+To make the scatterplot look more typical, we can switch to logarithmic coordinate axis spacing.
+
+```{r, eval = TRUE}
+diamond.plot + geom_point() + coord_trans(x = "log10", y = "log10")
+
+```
+
+#### Conditional plots
+
+We can create plots showing the relationship between variables across different values of a factor.  For instance, here's a scatterplot showing how diamond price varies with carat size, conditioned on color.  It's created using the `facet_wrap(~ factor1 + factor2 + ... + factorn)` command.
+
+```{r, fig.width=11, fig.height=4.5, dpi=70, cache=TRUE}
+
+diamond.plot <- ggplot(data = diamonds, aes( x = carat, y = price, colour = color))
+
+diamond.plot + geom_point() + facet_wrap(~cut)
+
+```
+
+You can also use `facet_grid()` to produce this type of output.
+
+```{r, fig.width=11, fig.height=4.5, dpi=70, cache=TRUE}
+# straight line plot 
+
+diamond.plot + geom_point()+ facet_grid(. ~ cut)
+
+```
+
+```{r, fig.width = 8, fig.height = 10, dpi = 70, cache = TRUE}
+diamond.plot + geom_point()+ facet_grid(cut ~ .)
+
+
+```
+
+
+`ggplot` can create a lot of different kinds of plots, which are known as `geoms` or "geometries".  Here are some examples.
+
+Function | Description
+---------------------|------------------------------------------------
+`geom_point(...)` | Points, i.e., scatterplot
+`geom_bar(...)` | Bar chart
+`geom_line(...)` | Line chart
+`geom_boxplot(...)` | Boxplot
+`geom_violin(...)` | Violin plot
+`geom_density(...)` | Density plot with one variable
+`geom_density2d(...)` | Density plot with two variables
+`geom_histogram(...)` | Histogram
+
+#### A bar chart
+
+```{r, fig.height = 3.75, fig.width = 5}
+qplot( x =race, data = birthwt, geom = "bar")
+
+```
+
+
+
+#### Histograms and density plots
+
+```{r, fig.height = 3.75, fig.width = 5}
+base.plot <- ggplot(birthwt, aes(x = mother.age)) +
+  xlab("Mothers, age")
+base.plot + geom_histogram()
+base.plot + geom_histogram(aes(fill = race))
+base.plot + geom_density()
+base.plot + geom_density(aes(fill=race), alpha =0.5)
+```
+
+#### Box plots and violin plots
+
+```{r, fig.height = 3.75, fig.width = 6}
+base.plot <- ggplot(birthwt, aes(x = as.factor(physician.visits), y = birthwt.grams))+
+                      
+          xlab("Number of first trimester physician visits")+
+          ylab("Infant's birthweight(grams)")
+          
+  # Box Plot 
+  base.plot + geom_boxplot()
+  
+  # violin Plot 
+  base.plot + geom_violin()
+
+```
+
+#### Visualizing means
+
+Previously we calculated the following table:
+```{r}
+tbl.mean.bwt <- birthwt %>% 
+  
+  group_by(race, mother.smokes) %>% 
+  
+  summarize(mean.birthwt = round(mean(birthwt.grams), 0))
+      
+            tbl.mean.bwt
+
+```
+
+We can plot this table in a nice bar chart as follows:
+
+```{r, fig.height = 3.75, fig.width = 5}
+
+# Define basic aesthetic parameters 
+
+p.bwt <- ggplot(data = tbl.mean.bwt,
+                aes(y = mean.birthwt, x = race, fill = mother.smokes))
+
+# Pick Colors of the Bars 
+
+bwt.colors <- c("#009E73", "#999999")
+
+# Display Barchat 
+
+p.bwt + geom_bar(stat = "identity", position = "dodge") +
+  ylab("Average Birthweight")+ 
+  xlab("Mother's race") + 
+  guides(fill = guide_legend(title= "Mother's smoking status")) +
+  scale_fill_manual(values=bwt.colors)
+
+```
+
+#### Does the association between birthweight and mother's age depend on smoking status?
+
+We previously ran the following command to calculate the correlation between mother's ages and baby birthweights broken down by the mother's smoking status.
+
+```{r}
+birthwt %>% 
+  group_by(mother.smokes) %>% 
+  summarize(cor_bwt_age = cor(birthwt.grams, mother.age))
+
+```
+
+Here's a visualization of our data that allows us to see what's going on.
+
+```{r, fig.height=4.5, fig.width=6, fig.align='center'}
+
+ggplot(birthwt, 
+       aes(x = mother.age, y= birthwt.grams, shape= mother.smokes, color = mother.smokes))+ 
+  geom_point() + # Adds points (scatterplot)
+geom_smooth(method = "lm") + # Adds regression lines 
+  ylab("Birth Weight (grams)") + # Changes y-axis label 
+  xlab("Mother's age(years)")   + # Changwes x-axis label 
+  ggtitle("Birth weight by Mother's age") # Changes plot title
+
+```

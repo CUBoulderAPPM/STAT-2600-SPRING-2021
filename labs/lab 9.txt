@@ -1,0 +1,138 @@
+---
+title: "Lab 9"
+author: "Your name here"
+date: ""
+output: 
+  html_document:
+    fig_width: 7
+    fig_height: 5
+---
+
+##### Remember to change the `author: ` field on this Rmd file to your own name.
+
+We'll begin by loading some packages.
+```{r}
+library(tidyverse)
+Cars93 <- as_tibble(MASS::Cars93)
+```
+
+### Testing 2 x 2 tables
+
+Doll and Hill's 1950 article studying the association between smoking and lung cancer contains one of the most important 2 x 2 tables in history.  
+
+Here's their data:
+
+```{r}
+smoking <- as.table(rbind(c(688, 650), c(21, 59)))
+dimnames(smoking) <- list(has.smoked = c("yes", "no"),
+                    lung.cancer = c("yes","no"))
+smoking
+```
+
+**(a)** Use `fisher.test()` to test if there's an association between smoking and lung cancer.
+
+```{r}
+# Edit me
+```
+
+**(b)** What is the odds ratio?  Interpret this quantity.
+
+```{r}
+# Edit me
+```
+
+**(c)** Are your findings statistically significant?
+
+```{r}
+# Edit me
+```
+
+
+### Plotting error bars
+
+Using Doll and Hill's smoking data and, construct a bar graph with accompanying error bars showing the proportion of study participants with lung cancer. 
+
+To succeed in this exercise, you'll have to follow along careful with the lecture notes.  Please read the section titled "Plotting the table values with confidence".
+
+```{r}
+# Edit me
+```
+
+### ANOVA with birthwt data
+
+Let's form our favourite birthwt data set.
+
+```{r}
+# Import data, rename variables, and recode factors all in one set of piped 
+# commands
+birthwt <-  as_tibble(MASS::birthwt)  %>%
+  rename(birthwt.below.2500 = low, 
+         mother.age = age,
+         mother.weight = lwt,
+         mother.smokes = smoke,
+         previous.prem.labor = ptl,
+         hypertension = ht,
+         uterine.irr = ui,
+         physician.visits = ftv,
+         birthwt.grams = bwt) %>%
+  mutate(race = recode_factor(race, `1` = "white", `2` = "black", `3` = "other")) %>%
+  mutate_at(c("mother.smokes", "hypertension", "uterine.irr", "birthwt.below.2500"),
+            ~ recode_factor(.x, `0` = "no", `1` = "yes"))
+```
+
+
+
+**(a)** Create a new factor that categorizes the number of physician visits into four levels: 0, 1, 2, 3 or more.  
+
+```{r}
+# Edit me
+```
+
+**Hint**: One way of doing this is with `recode` by specifying `.default = "3 or more"`.  Have a look at the help file for `recode` to learn more.  
+
+**(b)** Run an ANOVA to determine whether the average birth weight varies across number of physician visits.  Interpret the results.
+
+```{r}
+# Edit me
+```
+
+
+### Linear regression with Cars93 data
+
+Below is figure showing how Price varies with EngineSize in the Cars93, with accompanying regression lines.  There are two plots, one for USA cars, and one for non-USA cars.
+
+```{r, fig.align='center', fig.height = 4}
+qplot(data = Cars93, x = EngineSize, y = Price, colour = Origin) + 
+  facet_wrap("Origin") + 
+  stat_smooth(method = "lm") + 
+  theme(legend.position="none")
+```
+
+**(a)** Use the `lm()` function to regress Price on EngineSize and Origin
+
+```{r}
+# Edit me
+```
+
+**(b)** Run `plot()` on your `lm` object.  Do you see any problems?
+
+```{r, fig.width = 6, fig.height = 7}
+par(mfrow = c(2,2))
+# Edit me
+```
+
+
+**(c)** Try running a linear regression with `log(Price)` as your outcome.
+
+```{r}
+# Edit me
+```
+
+**(d)** Run `plot()` on your new `lm` object.  Do you see any problems?
+
+```{r, fig.width = 6, fig.height = 7}
+par(mfrow = c(2,2))
+# Edit me
+```
+
+ 

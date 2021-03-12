@@ -1,0 +1,300 @@
+---
+title: "Homework 1"
+author: "Your Name Here"
+date: 'Assigned: October 23, 2019'
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    theme: paper
+    highlight: tango
+---
+
+##### This homework is due by **2:50pm on Thursday, October 31**.  To complete this assignment, follow these steps:
+
+1. Download the `homework1.Rmd` file from Canvas or the course website.
+
+2. Open `homework1.Rmd` in RStudio.
+
+3. Replace the "Your Name Here" text in the `author:` field with your own name.
+
+4. Supply your solutions to the homework by editing `homework1.Rmd`.
+
+5. When you have completed the homework and have **checked** that your code both runs in the Console and knits correctly when you click `Knit HTML`, rename the R Markdown file to `homework1_YourNameHere.Rmd`, and submit on Canvas  (YourNameHere should be changed to your own name.)
+
+##### Homework tips:
+
+1. Recall the following useful RStudio hotkeys.
+
+|Keystroke      | Description |
+|----------------|-----------------------------------------------------------------------------|
+| `<tab>`        | Autocompletes commands and filenames,  and lists arguments for functions.|
+| `<up>`         | Cycles through previous commands in the console prompt |
+| `<ctrl-up>`    | Lists history of previous commands matching an unfinished one |
+| `<ctrl-enter>` | Runs current line from source window to Console. Good for trying things out ideas from a source file. |
+| `<ESC>`        | Aborts an unfinished command and get out of the + prompt |
+
+
+
+
+**Note**: Shown above are the Windows/Linux keys.  For Mac OS X, the `<ctrl>` key should be substituted with the `<command>` (&#8984;) key.
+
+2. Instead of sending code line-by-line with `<ctrl-enter>`, you can send entire code chunks, and even run all of the code chunks in your .Rmd file. Look under the <Chunks> menu of the Source panel.
+
+3. Run your code in the Console and Knit HTML frequently to check for errors.
+
+4. You may find it easier to solve a problem by interacting only with the Console at first. 
+
+### Homework 1 outline
+
+This homework gets you to create a "Cheat Sheet" that you can refer back to over the course of the semester. 
+
+```{r}
+library(tidyverse)
+```
+
+### Problem 1: Simple Boolean operations
+
+> Tip:  Note that each of the code blocks in this Problem contain the expression `eval = FALSE`.  This tells R Markdown to display the code contained in the block, but not to evaluate it.  To check that your answer makes sense, be sure to try it out in the console with various choices of values for the variable `x`.   
+
+
+##### (a) Checking equality.
+
+Given a variable `x`, write a Boolean expression that will evaluate to `TRUE` if the variable `x` is equal to `94842` (the numeric value).  
+
+```{r, eval = FALSE}
+# Insert your Boolean expression here
+```
+
+##### (b) Checking inequality.
+
+Given a variable `x`, write a Boolean expression that will evaluate to `TRUE` if the variable `x` is *not* `NA` (i.e., is not missing).
+
+```{r, eval = FALSE}
+# Insert your Boolean expression here
+```
+
+##### (c) Checking if a number is in a given range. 
+
+Given a (possibly negative) number `x`, write a Boolean expression that returns `TRUE` if and only if `x` is smaller than `-12` or bigger than `29`.  
+
+```{r, eval=FALSE}
+# Insert your Boolean expression here
+```
+
+##### (d) A more complicated example.
+
+Given an integer number `x`, write a Boolean expression that returns `TRUE` if and only if `x` is an **odd** number between -6 and 16 or 102 and 250.  
+
+```{r, eval=FALSE}
+# Insert your Boolean expression here
+```
+
+**Tip**: Recall the modulus operator we saw in lecture 1: `%%`.  For integers `x` and `y`, `x %% y` is the remainder of `x` divided by `y`.  
+
+### Problem 2: Vector Boolean operations
+
+##### (a) R has two kinds of Boolean operators implemented, single (`&`, `|`) and double (`&&`, `||`).  
+
+One of these operators takes advantage of something called *lazy evaluation* while the other does not.  They also don't behave the same way when applied to *vectors*.  
+
+Read the help file (`help("||")`) and construct some examples to help figure out how the two behave.  
+
+To help you get started, try out the following two examples in your console:
+
+```{r, eval = FALSE}
+# Example:  The variable y.prob2a is never defined.  
+# (Do not define it!)
+# What happens when you run this code?
+x.prob2a <- 5
+(x.prob2a < 10) | (y.prob2a > 2)
+(x.prob2a < 10) || (y.prob2a > 2)
+```
+
+```{r, eval = FALSE}
+# Define vectors
+x.prob2a.vec <- c(TRUE, FALSE, FALSE)
+y.prob2a.vec <- c(TRUE, TRUE, FALSE)
+
+# Apply various Boolean operations to see what happens
+x.prob2a.vec & y.prob2a.vec
+x.prob2a.vec && y.prob2a.vec
+x.prob2a.vec | y.prob2a.vec
+x.prob2a.vec || y.prob2a.vec
+```
+
+Can you explain what's happening?  Write up a brief explanation below.
+
+<font color="#336600">
+
+**Replace this text with your explanation.**
+
+</font>
+
+##### (b) Using `all()`
+
+Two people were asked to give their preferences between two options: [Facebook, Twitter], [Firefox, Chrome], [Mac, PC], [Summer, Winter].  Their results are given below.
+
+```{r}
+alice.prefs <- c("Twitter", "Chrome", "Mac", "Summer")
+bob.prefs <- c("Facebook", "Chrome", "PC", "Summer")
+```
+
+Use the `all()` function to determine if the two people have identical preferences. (Your code should ouput a single Boolean value, either `TRUE` or `FALSE`)
+
+```{r}
+# Edit me
+```
+
+##### (c) Using `any()` 
+
+Use the `any()` function to determine if the two people have any preferences in common.  (Your code should output a single Boolean value, either `TRUE` or `FALSE`)
+```{r}
+# Edit me
+```
+
+
+
+##### (d) Missing values.
+
+Let `age` be the vector defined below.
+
+```{r}
+age <- c(18, NA, 25, 71, NA, 45, NA, NA, 18)
+```
+
+Write a Boolean expression that checks whether each entry of `age` is missing (recall missing values are denoted by `NA`).  Your expression should return a Boolean vector having the same length as `age`.
+
+```{r}
+# Edit me
+```
+
+### Problem 3: Referencing vector elements
+
+##### (a)  `which()` practice
+
+Write code that returns the indexes of `age` that are missing.
+
+```{r}
+# Edit me
+```
+
+##### (b) Getting non-missing values
+
+Write code that uses negative indexes and your solution from (a) to return only the values of `age` that are *not* missing. (i.e., your code should result in a vector with elements: 18, 25, 71, 45, 18) 
+
+
+```{r}
+# Edit me
+```
+
+##### (c)  A more direct way of getting non-missing values
+
+Using the negation operator `!` and the `is.na()` function, write an expression that returns only the values of `age` that are *not* missing.
+
+```{r}
+# Edit me
+```
+
+##### (d) More `which()` practice
+
+For the next three problem we'll go back to the `cars` data set.
+
+```{r}
+speed <- cars$speed
+dist <- cars$dist
+```
+
+Write code to figure out which cars had a stopping distance of 15 feet or more.
+
+```{r}
+# Edit me
+```
+
+##### (e) `which.min`, `which.max` practice
+
+Use the `which.min()` function to figure out which car had the *shortest* stopping distance. (Your code should return the car's index.)
+
+```{r}
+# Edit me
+```
+
+##### (f) More practice 
+
+Use the `which.max()` function to figure out the *speed* of the car that had the *longest* stopping distance.  (Your code should return the car's speed.)
+
+```{r}
+# Edit me
+```
+
+### Problem 4: Data frame basics
+
+
+##### (a) Importing data.
+
+In Lecture 2 we saw how to use the `read.table()` function to import the survey data.  Now we'll use a different function.  Use the `read.csv()` function to import the survey data into a variable called `survey`.
+
+```{r}
+# Edit me
+```
+
+**Tip**: The data file is located at `http://www.andrew.cmu.edu/user/achoulde/94842/data/survey_data2019.csv`.  Do not download the file.  Import the data directly using the URL.
+
+##### (b) `$` notation
+
+Use the `$` operator to select the TVhours column from the `survey` data
+
+```{r}
+# Edit me
+```
+
+##### (c) [,] notation
+
+Repeat part (b) using `[,]` notation.  i.e., Use `[,]` notation to select the TVhours column from the `survey` data by name (i.e., obtain this column by using the name "TVhours" instead of using the column number)
+
+```{r}
+# Edit me
+```
+
+##### (d) [[]] notation
+
+Repeat part (c) with [[]] notation.
+
+```{r}
+# Edit me
+```
+
+##### (e) [] notation
+
+Repeat part (d), but this time using single blackets (`[ ]`) notation.  
+
+(Observe that this returns a new single-column *data frame*, not just a vector.) 
+
+```{r}
+# Edit me
+```
+
+##### (f) `filter()` and `select()` practice
+
+Use the `filter()` and `select()` functions to grab the Program and TV watching information for all PPM students who have no prior programming experience (PriorExp).   
+
+```{r}
+# Edit me
+```
+
+
+### Problem 5: Data summaries and inline code practice.
+
+##### (a) Bar graph
+
+Create a bar graph of respondents' Rexperience.
+
+```{r, fig.align='center', fig.width=7, fig.height=4}
+# Edit me
+```
+
+##### (b) Inline code practice
+
+Replace all occurrences of ???? in the paragraph below with an inline code chunk supplying the appropriate information.
+
+> Of the ???? survey respondents, ???? were NOT from the MISM program.  We found that ????% of the all students in the class use the Mac OS X operating system.  ????% of of PPM students report having Basic competence in R.

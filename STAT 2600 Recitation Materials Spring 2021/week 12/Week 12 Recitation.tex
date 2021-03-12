@@ -1,0 +1,41 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{MnSymbol}
+\usepackage{pgfplots}
+\usepackage{physics}
+\usepackage{titling}
+
+\pgfplotsset{compat=1.6}
+
+\begin{document}
+%--------------------------------------title--------------------------------------
+\begin{flushright} STAT 2600 Recitation\\* 11/10/2020 \end{flushright}
+\begin{center}
+\textbf{Recitation Week 12 Problems}
+\end{center}
+%--------------------------------------body--------------------------------------
+"The goal of a model is not to uncover truth, but to discover a simple approximation that is still useful." Today we will use the techniques from Chapter 23 to model bid price in foreclosure auctions in California. When a property is foreclosed on, the lender auctions the property in a 'foreclosure auction' open to the public in order to recuperate the lost funds. Recently the DOJ broke up a cartel that had formed in the foreclosure auction market in California where the colluding parties would "pre-auction" the properties among themselves and then artificially lower the bidding price (by not competing with each other). This dataset contains information on properties sold in these foreclosure auctions during the time period of the cartel - the variable "CartelCompany" indicates if the buyer was one of the companies prosecuted by the DOJ. 
+ 
+    \begin{enumerate}
+
+	\item[1) ]{What is a family of equations? Write down two different examples of a family of equations you might use in a linear regression model. What are the key differences between the two families you wrote down in terms of your data and model?}
+	
+	\item[2) ]{Pick one variable to predict auction price and fit a simple linear model with the following equation: $\hat{y} = \beta_0 + \beta_1x_1 + \epsilon$. Following the techniques of 23.2 and 23.3 in the textbook, plot a freqpoly of your residuals, and plot your residuals against your predictor variable - was your model a good fit? argue based on both plots.}
+	
+	\item[2) ]{Pick at least one categorical variable and at least one continuous variable to predict price and fit a model of the form: $\hat{y} = \beta_0 + \beta_1x_1+\beta_2x_2 + \beta_3x_1*x_2 +  \epsilon$. Again following the techniques of 23.2 and 23.3 in the textbook plot a freqpoly of your residuals - was your model a good fit? Use 'gather\_residuals()' and 'facet\_wrap()' to create a plot of your residuals against the continuous variable for each level of the categorical variable.}
+	
+	\item[4) ]{What is the interaction term $x_1*x_2$? What does the corresponding coefficient tell you about your data?}
+	
+	\item[5) ]{If you investigated the effect of "CartelCompany" on price, what did you find?}
+   
+     \end{enumerate}
+\end{document}
+
+

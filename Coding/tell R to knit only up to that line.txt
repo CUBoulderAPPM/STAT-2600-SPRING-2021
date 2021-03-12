@@ -1,0 +1,1 @@
+`r knitr::knit_exit()`

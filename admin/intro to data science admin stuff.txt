@@ -1,0 +1,11 @@
+
+
+This is the textbook he used: https://r4ds.had.co.nz/
+And solutions to the textbook questions: https://jrnold.github.io/r4ds-exercise-solutions/
+
+https://alldocs.app/convert-html-to-jupyter-notebook
+
+https://www.andrew.cmu.edu/user/achoulde/94842/homework/homework1.html#homework-1-outline
+
+data 
+http://www.andrew.cmu.edu/user/achoulde/94842/data/

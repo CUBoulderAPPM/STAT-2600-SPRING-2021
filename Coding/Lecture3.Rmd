@@ -1,0 +1,380 @@
+---
+title: 'Lecture 3: <br> Manipulating data; lists; functions; if-else statements'
+author: "Dr. Osita Onyejekwe"
+date: "Spring 2021"
+output:
+  ioslides_presentation:
+    widescreen: true
+    smaller: true
+    highlight: Rpub
+---
+
+## Agenda
+
+- Wrap up of Lecture 2 content  # done 
+- More on data frames
+- Basic tidyverse (dplyr) commands
+- Lists
+- Writing functions in R
+- If-else statements
+- R coding style
+
+## Wrapping up Lecture 2 content  
+
+
+## Load tidyverse
+- Most of the functions we're using just come from `dplyr`, but we'll load all of `tidyverse` anyway
+```{r, message=FALSE, warning = FALSE}
+#install.packages('tidyverse')
+library(tidyverse)
+```
+
+
+## Grab a toy dataset from MASS library
+- Rather than loading the full MASS library, we'll use the `::` syntax to pull a specific object/function from the library
+
+- Loading all of MASS with `library(MASS)` after tidyverse is loaded has the unintended consequence of replacing the `dplyr` select command with the `MASS` select command.  This is BAD, and leads to errors.
+
+```{r, message=FALSE, warning = FALSE}
+Cars93 <- MASS::Cars93
+head(Cars93, 3)
+
+```
+
+## Adding a column: `mutate()` function from `dplyr`
+
+- **`mutate()`** returns a new data frame with columns modified or added as specified by the function call
+
+```{r}
+Cars93.metric <- mutate(Cars93,
+                        KMPL.city = 0.425 * MPG.city, KMPL.highway = 0.425* MPG.highway)
+
+tail(names(Cars93.metric))
+
+```
+
+- Our data frame has two new columns, giving the fuel consumption in km/l
+
+## Another approach
+```{r}
+# Add a new column called KMPL.city.2
+
+Cars93.metric$KMPL.city.2<- 0.425* Cars93$MPG.city
+
+tail(names(Cars93.metric))
+
+```
+
+- Let's check that both approaches did the same thing
+
+```{r}
+
+identical( Cars93.metric$KMPL.city , Cars93.metric$KMPL.city.2)
+identical(5,4)
+
+
+```
+
+
+## Changing levels of a factor: `recode()`
+```{r}
+manufacturer <- Cars93$Manufacturer
+head(manufacturer, 8)
+
+```
+
+
+We'll use the **`recode()`** function from the `dplyr` library, which gets loaded when you load `tidyverse`.
+
+```{r}
+# Map Chevrolet, Pontiac and Buick to GM
+
+
+manufacturer.combined <- recode(manufacturer, "Chevrolet" = "GM", "Pontiac"= "GM", "Buick"= "GM")
+head(manufacturer.combined, 8)
+
+# Stopped here on 02/03/2021
+
+```
+
+
+
+## Another example: `recode_factor()`
+- A lot of data comes with integer encodings of levels
+
+- You may want to convert the integers to more meaningful values for the purpose of your analysis
+
+- Let's pretend that in the class survey 'Program' was coded as an integer with 1 = MISM, 2 = Other, 3 = PPM
+
+```{r}
+# practice on your own with numeric values for the categories for Program 
+# Load data survey
+# Recode Program to have integer codings 
+survey<- read.csv('/Users/osita/OneDrive/Desktop/STAT 2600 SPRING 2021/Coding/survey_data2020.csv')
+survey<- mutate(survey, Program=as.numeric(Program))
+head(survey)
+
+
+```
+
+## Example continued: recode_factor()
+
+- Here's how we would get back the program codings using **`recode_factor()`**, a variant of `recode` that returns a factor, with elements ordered according to the mapping order.  
+- Note the backticks ` ` around the numbers, which are necessary for parsing
+
+```{r}
+survey<- mutate(survey,  Program = recode_factor(Program, 
+                                                 `3` = "PPM",
+                                                 `1` = "MISM",
+                                                 `2` = "Other"))
+head(survey)
+# practice on your own 
+
+```
+
+
+## Some more data frame summaries: `table()` function
+
+- Let's revisit the Cars93 dataset
+
+- The **`table()`** function builds **contingency tables** (i.e., count tables) showing counts at each combination of factor levels
+
+```{r}
+table(Cars93$AirBags)
+
+```
+## 
+```{r}
+table(Cars93$Origin)
+
+table(Cars93$AirBags, Cars93$Origin)
+
+```
+
+- Looks like US and non-US cars had about the same distribution of AirBag types
+
+- Later in the class we'll learn how to do a hypothesis tests on this kind of data
+
+
+## Alternative syntax
+
+- When `table()` is supplied a data frame, it produces contingency tables for all combinations of factors 
+
+```{r}
+#head(Cars93[c("AirBags", "Origin")], 3)
+table(Cars93[c("AirBags", "Origin")])
+
+```
+
+## Tidy count tables: `count()`
+
+If we're going to be plotting or further analysing our results, it is helpful to have them in a data frame instead of a tabular layout.  That's where the **`count()`** function comes in.
+
+```{r}
+Cars93 %>% count(AirBags)
+Cars93 %>% count(AirBags, Origin)
+
+```
+
+## Basics of lists
+
+> A list is a **data structure** that can be used to store **different kinds** of data
+
+- Recall: a vector is a data structure for storing *similar kinds of data*
+
+- To better understand the difference, consider the following example.
+
+```{r}
+
+my.vector.1 <- c("Michael", 165, TRUE)  # (name, weight, is.male)
+my.vector.1
+
+typeof(my.vector.1)  #All the elements ae not character strings: 
+
+```
+
+## Lists vs. vectors
+
+```{r}
+my.vector.2 <- c(FALSE, TRUE, 27)  #( is.male, is.citizen, age)
+typeof(my.vector.2)
+
+```
+
+- Vectors expect elements to be all of the same type (e.g., `Boolean`, `numeric`, `character`)
+
+- When data of different types are put into a vector, the R converts everything to a common type
+
+## Lists
+
+- To store data of different types in the same object, we use lists
+
+- Simple way to construct lists: use **`list()`** function
+
+- (We'll learn about functions like `map` and `map_chr` soon.)
+
+```{r}
+
+my.list<- list("Michael", 165, TRUE)
+my.list
+
+map_chr(my.list, typeof)
+
+```
+
+## Named elements
+```{r}
+patient.1<- list(name= "Michael", weight = 165, is.male=TRUE)
+patient.1
+
+```
+
+## Referencing elements of a list (similar to data frames)
+```{r}
+patient.1$name  # Get "name" element (returns a string)
+patient.1[["name"]]   # get "name" element (returns a string)
+patient.1["name"] # Get "name" slice (returns a list)
+ c(typeof(patient.1$name), typeof(patient.1["name"]))
+ # we stopped here on 02/05/2021
+```
+
+## Functions
+- We have used a lot of built-in functions: `mean()`, `subset()`, `plot()`, `read.table()`...
+
+- An important part of programming and data analysis is to write custom functions
+
+- Functions help make code **modular**
+
+- Functions make debugging easier
+
+- Remember: this entire class is about applying *functions* to *data*
+
+## What is a function?
+
+> A function is a machine that turns **input objects** (arguments) into an **output object** (return value) according to a definite rule.
+
+- Let's look at a really simple function
+
+```{r}
+addOne <- function(x) {x+1}
+
+```
+
+- `x` is the **argument** or **input**
+
+- The function **output** is the input `x` incremented by 1
+
+```{r}
+addOne(12)
+```
+
+## More interesting example
+
+- Here's a function that returns a % given a numerator, denominator, and desired number of decimal values
+
+```{r}
+calculatePercentage <- function(x,y,d){decimal <- x/y    # calculate decimal value 
+round(100* decimal, d)}     # convert to % and round to d digits
+calculatePercentage(27,80,1)
+
+```
+
+- If you're calculating several %'s for your report, you should use this kind of function instead of repeatedly copying and pasting code
+
+## Function returning a list
+- Here's a function that takes a person's full name (FirstName LastName), weight in lb and height in inches and converts it into a list with the person's first name, person's last name, weight in kg, height in m, and BMI.
+
+```{r}
+createPatientRecord<- function(full.name, weight, height){
+name.list <- strsplit(full.name, split = " ")[[1]]
+first.name <- name.list[1]
+last.name<- name.list[2]
+weight.in.kg <- weight / 2.2
+height.in.m <- height * 0.0254
+bmi <- weight.in.kg/(height.in.m  ^ 2)
+list(first.name= first.name, last.name= last.name, weight=weight.in.kg, height= height.in.m, bmi=bmi)
+}
+
+```
+ 
+## Trying out the function
+```{r}
+createPatientRecord("Michael Smith", 185, 12*6+1)
+```
+
+## Another example: 3 number summary
+- Calculate mean, median and standard deviation
+```{r}
+threeNumberSummary<- function(x) { 
+  c(mean = mean(x), median=median(x), sd=sd(x))
+  }
+x<- rnorm(100, mean = 5, sd=2) # Vector of 100 normals with mean  =5 , sd = 2 
+threeNumberSummary(x)
+```
+
+
+## If-else statements
+
+- Oftentimes we want our code to have different effects depending on the features of the input
+
+- Example: Calculating a student's letter grade
+  - If grade >= 90, assign A
+  - Otherwise, if grade >= 80, assign B
+  - Otherwise, if grade >= 70, assign C
+  - In all other cases, assign F
+
+- To code this up, we use if-else statements
+
+## If-else Example: Letter grades
+```{r}
+
+
+calculateLetterGrade <- function(x) { 
+  
+  if(x >= 90)  {
+grade <-  "A"
+} else if (x >= 80) { 
+  
+grade <- "B"
+
+} else if (x >= 70) { 
+  grade <- "C"
+
+} else {
+  
+  grade <- "F"
+}
+  grade 
+}
+
+course.grades <- c(92, 78, 87, 91, 62)
+map_chr(course.grades, calculateLetterGrade)
+
+```
+
+## `return()`
+
+- In the previous examples we specified the output simply by writing the output variable as the last line of the function
+
+- More explicitly, we can use the **`return()`** function
+
+```{r}
+addOne<- function(x) { 
+  return(x+1)
+  
+  }
+addOne(12)
+
+
+```
+
+- We will generally avoid the `return()` function, but you can use it if necessary or if it makes writing a particular function easier.
+- Google's style guide suggests explicit returns.  Most do not. 
+
+## Reminders
+
+- Homework 1 **due 11:59PM MST on Wednesday FEB 10 **
+
+- Lab 3 is due Friday 11:59PM Feb 05
+
+- If you have questions, feel free to post on the Discord Channel or attend office hours

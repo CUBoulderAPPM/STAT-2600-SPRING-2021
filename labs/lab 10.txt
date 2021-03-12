@@ -1,0 +1,117 @@
+---
+title: "Lab 10"
+author: "Your Name Here"
+date: ""
+output: html_document
+---
+
+##### Remember to change the `author: ` field on this Rmd file to your own name.
+
+### Learning objectives
+
+> In today's Lab you will gain practice with the following concepts from today's class:
+
+>- Interpreting linear regression coefficients of numeric covariates
+- Interpreting linear regression coefficients of categorical variables
+- Applying the "2 standard error rule" to construct approximate 95% confidence intervals for regression coefficients
+- Using the `confint` command to construct confidence intervals for regression coefficients
+- Using `pairs` plots to diagnose collinearity
+- Using the `update` command to update a linear regression model object
+- Diagnosing violations of linear model assumptions using `plot`
+
+We'll begin by loading some packages.
+```{r}
+library(tidyverse)
+library(knitr)
+
+Cars93 <- as_tibble(MASS::Cars93)
+# If you want to experiment with the ggpairs command,
+# you'll want to run the following code:
+# install.packages("GGally")
+# library(GGally)
+```
+
+### Linear regression with Cars93 data
+
+**(a)** Use the `lm()` function to regress Price on: EngineSize, Origin, MPG.highway, MPG.city and Horsepower.
+
+```{r}
+# Edit me
+```
+
+**(b)** Use the `kable()` command to produce a nicely formatted coefficients table.  Ensure that values are rounded to an appropriate number of decimal places.
+
+```{r}
+# Edit me
+```
+
+> Replace this text with your answer.
+
+
+**(c)** Interpret the coefficient of `Originnon-USA`.  Is it statistically significant?
+
+```{r}
+# Edit me
+```
+
+> Replace this text with your answer.
+
+**(d)** Interpret the coefficient of `MPG.highway`.  Is it statistically significant?
+
+```{r}
+# Edit me
+```
+
+> Replace this text with your answer.
+
+
+**(d)** Use the "2 standard error rule" to construct an approximate 95% confidence interval for the coefficient of `MPG.highway`.  Compare this to the 95% CI obtained by using the `confint` command.
+
+```{r}
+# Edit me
+```
+
+> Replace this text with your answer.
+
+**(e)**  Run the `pairs` command on the following set of variables: EngineSize, MPG.highway, MPG.city and Horsepower.  Display correlations in the   Do you observe any collinearities?  
+
+```{r}
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(0, 1, 0, 1))
+    r <- abs(cor(x, y))
+    txt <- format(c(r, 0.123456789), digits = digits)[1]
+    txt <- paste0(prefix, txt)
+    if(missing(cex.cor)) cex.cor <- 0.4/strwidth(txt)
+    text(0.5, 0.5, txt, cex = pmax(1, cex.cor * r))
+}
+
+
+# Edit me
+```
+
+> Replace this text with your answer.
+
+**(f)** Use the `update` command to update your regression model to exclude `EngineSize` and `MPG.city`.  Display the resulting coefficients table nicely using the `kable()` command.
+
+```{r}
+# Edit me
+```
+
+
+**(g)**  Does the coefficient of `MPG.highway` change much from the original model?  Calculate a 95% confidence interval and compare your answer to part (d).  Does the CI change much from before?  Explain.
+
+```{r}
+# Edit me
+```
+
+> Replace this text with your answer.
+
+**(h)** Run the `plot` command on the linear model you constructed in part (f).  Do you notice any issues?
+
+```{r, fig.height = 12, fig.width = 12}
+# Edit me
+```
+
+> Replace this text with your answer.

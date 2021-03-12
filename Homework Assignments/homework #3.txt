@@ -1,0 +1,198 @@
+---
+title: "Homework 3"
+author: "Your Name Here"
+date: 'Assigned: February 1, 2018'
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    theme: paper
+    highlight: tango
+---
+
+##### This homework is due by **1:20pm on Thursday, February 8**.  To complete this assignment, follow these steps:
+
+1. Download the `homework3.Rmd` file from Canvas or the course website.
+
+2. Open `homework3.Rmd` in RStudio.
+
+3. Replace the "Your Name Here" text in the `author:` field with your own name.
+
+4. Supply your solutions to the homework by editing `homework3.Rmd`.
+
+5. When you have completed the homework and have **checked** that your code both runs in the Console and knits correctly when you click `Knit HTML`, rename the R Markdown file to `homework3_YourNameHere.Rmd`, and submit on Canvas  (YourNameHere should be changed to your own name.)
+
+### Loading packages
+
+The code chunk below appears in the Rmd file, but won't be displayed in your html output.  
+
+```{r, include = FALSE}
+library(MASS)
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+```
+
+
+### Problem 1: A few simple plots
+
+For this problem we'll use the `diamonds` dataset from the `ggplot2` package.
+
+##### (a) Base R graphics
+
+Use the `hist` function to create a histogram of `carat` with bars colored `steelblue`.  
+```{r}
+# Edit me
+```
+
+##### (b) qplot histogram
+
+Use the `qplot` function from the `ggplot2` package to create a histogram of `depth`.  Note that `geom = "histogram"` is a valid geometry in `qplot`.  
+
+```{r}
+# Edit me
+```
+
+##### (c) qplot violin plots
+
+Use the `qplot` function from the `ggplot2` library to create violin plots showing how `price` varies across diamond `cut`.  Specify `fill = cut` to get all the boxplots to be coloured differently.
+
+```{r}
+# Edit me
+```
+
+**Hint**: For this exercise, it will be useful to know that `violin` is a geometry (`geom`) built into `ggplot2`, and that `qplot` can be called with the arguments:
+```{r, eval = FALSE}
+qplot(x, y, data, geom, fill)
+```
+
+### Problem 2: ggplot practice 
+
+For this exercise we'll go back to the Cars93 data set in the MASS library
+
+##### (a) size mapping, geom_point()
+
+Define a `ggplot` object using the Cars93 data set that you can use to view `Price` on the y-axis, `MPG.highway` on the x-axis, and set the `size` mapping to be based on `Horsepower`.  
+
+Use `geom_point()` to create a scatterplot from your `ggplot` object.
+
+```{r}
+# Edit me
+```
+
+##### (b) colour mapping
+
+Repeat part (a), this time also setting the `colour` mapping to be based on `Origin`.
+
+```{r}
+# Edit me
+```
+
+##### (c) changing color palette
+
+Repeat part (b), this time using the `scale_colour_manual()` layer to specify that you want to use `cbPalette` as your color palette.
+
+```{r}
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+# Edit me
+```
+
+
+### Problem 3: More ggplot2 practice
+
+#####(a) stat_smooth()
+
+Repeat part 2(b), this time using `stat_smooth()` to add a layer showing the smoothed curve representing how `Price` varies with `MPG.highway`.  
+
+```{r}
+# Edit me
+```
+
+#####(b) facet_grid() 
+
+Use your ggplot object from 2(b) along with the `geom_point()` and `facet_grid` layers to create scatterplots of `Price` against `MPG.highway`, broken down by (conditioned on) `Origin`.  
+
+```{r}
+# Edit me
+```
+
+(Your code should produce a figure with two scatterplots, analogous to the `facet_wrap` example from class.  Note that the example from class had a factor with 7 levels, so 7 scatterplots were produced.  `Origin` has two levels.)
+
+#####(c) Overlaying regression lines.
+
+Modify your solution to part (b) to also display regression lines for each scatterplot.
+
+```{r}
+# Edit me
+```
+
+
+### Problem 4: ddply() practice
+
+This problem uses the Adult dataset, which we load below.  The main variable of interest here is `high.income`, which indicates whether the individual's income was over $50K.  Anyone for whom `high.income == 1` is considered a "high earner".
+
+```{r}
+adult.data <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data", header=FALSE, fill=FALSE, strip.white=T,
+                 col.names=c("age", "type_employer", "fnlwgt", "education", 
+                "education_num","marital", "occupation", "relationship", "race","sex",
+                "capital_gain", "capital_loss", "hr_per_week","country", "income"))
+adult.data <- mutate(adult.data,
+                     high.income = as.numeric(income == ">50K"))
+```
+
+##### (a) Income by education level
+
+Use the `ddply()` function to produce a summary table showing how many individuals there are in each `education_num` bin, and how the proportion of high earners varies across `education_num` levels.  Your table should have column names: `education_num`, `count` and `high.earn.rate`.  
+
+```{r}
+# Edit me
+```
+
+##### (b) Constructing a bar chart
+
+Using the `ggplot` and `geom_bar` commands along with your data summary from part **(a)** to create a bar chart showing the high earning rate on the y axis and `education_num` on the x axis.  Specify that the color of the bars should be determined by the number of individuals in each bin.
+
+```{r}
+# Edit me
+```
+
+##### (c) summary table with multiple splitting variables
+
+Use the `ddply()` function to produce a summary table showing how the proportion of high earners varies across all combinations of the following variables: `sex`, `race`, and `marital` (marital status).  In addition to showing the proportion of high earners, your table should also show the number of individuals in each bin.  Your table should have column names: `sex`, `race`, `marital`, `count` and `high.earn.rate`.  
+
+```{r}
+# Edit me
+```
+
+##### (d) Nicer table output using `kable()`
+
+Use the `kable()` function from the `knitr` library to display the table from part **(c)** in nice formatting.  You should use the `digits` argument to ensure that the values in your table are being rounded to a reasonable number of decimal places.  
+
+```{r}
+# Edit me
+```
+
+### Problem 5: Getting the right plot
+
+##### (a) A more complex bar chart.
+
+Using the table you created in 4(c), use ggplot graphics to construct a plot that looks like [the one at this link](http://www.andrew.cmu.edu/user/achoulde/94842/homework/target_fig.png)
+
+
+**Hint** You may find it useful to use the following layers: `facet_grid`, `coord_flip` (for horizontal bar charts), `theme` (rotating x axis text) and `guides` (removing fill legend). 
+
+```{r, fig.height = 4, fig.width = 8}
+# Edit me
+```
+
+##### (b)  Hiding code with `echo` 
+
+Repeat part **(a)**, but this time set the `echo` argument of the code chunk in such a way that the code is not printed, but the plot is still displayed.
+
+```{r, fig.height = 4, fig.width = 8}
+# Edit me
+```
+
+

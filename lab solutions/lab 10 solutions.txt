@@ -1,0 +1,124 @@
+---
+title: "Lab 10 solutions"
+author: "Osita Onyejekwe"
+date: ""
+output: html_document
+---
+
+##### Remember to change the `author: ` field on this Rmd file to your own name.
+
+### Learning objectives
+
+> In today's Lab you will gain practice with the following concepts from today's class:
+
+>- Interpreting linear regression coefficients of numeric covariates
+- Interpreting linear regression coefficients of categorical variables
+- Applying the "2 standard error rule" to construct approximate 95% confidence intervals for regression coefficients
+- Using the `confint` command to construct confidence intervals for regression coefficients
+- Using `pairs` plots to diagnose collinearity
+- Using the `update` command to update a linear regression model object
+- Diagnosing violations of linear model assumptions using `plot`
+
+We'll begin by loading some packages.
+```{r}
+library(tidyverse)
+library(knitr)
+
+Cars93 <- as_tibble(MASS::Cars93)
+# If you want to experiment with the ggpairs command,
+# you'll want to run the following code:
+# install.packages("GGally")
+# library(GGally)
+```
+
+### Linear regression with Cars93 data
+
+**(a)** Use the `lm()` function to regress Price on: EngineSize, Origin, MPG.highway, MPG.city and Horsepower.
+
+```{r}
+cars.lm <- lm(Price ~ EngineSize + Origin + MPG.highway + MPG.city + Horsepower,
+   data = Cars93)
+```
+
+**(b)** Use the `kable()` command to produce a nicely formatted coefficients table.  Ensure that values are rounded to an appropriate number of decimal places.
+
+```{r, results = 'asis'}
+kable(summary(cars.lm)$coef, digits = c(3, 3, 3, 4), format = "markdown")
+```
+
+
+**(c)** Interpret the coefficient of `Originnon-USA`.  Is it statistically significant?
+
+> The coefficient of `Originnon-USA` is `r round(coef(cars.lm)["Originnon-USA"], 2)`. This indicates that, all else in the model held constant, vehicles manufactured outside of the USA carry a price tag that is on average $`r round(coef(cars.lm)["Originnon-USA"], 2)` thousand dollars higher than vehicles manufactered in the US.  The coefficient is statistically significant at the 0.05 level. 
+
+**(d)** Interpret the coefficient of `MPG.highway`.  Is it statistically significant?
+
+> The coefficient of `MPG.highway` is `r round(coef(cars.lm)["MPG.highway"], 3)`, which is close to 0 numerically and is not statistically significant.  Holding all else in the model constant, MPG.highway does not appear to have much association with Price.
+
+
+**(d)** Use the "2 standard error rule" to construct an approximate 95% confidence interval for the coefficient of `MPG.highway`.  Compare this to the 95% CI obtained by using the `confint` command.
+
+```{r}
+est <- coef(cars.lm)["MPG.highway"]
+se <- summary(cars.lm)$coef["MPG.highway", "Std. Error"]
+# 2se rule confidence interval:
+c(est - 2 *se, est + 2 * se)
+
+# confint approach
+confint(cars.lm, parm = "MPG.highway")
+```
+
+> We see that the confidence intervals obtained via the two different approaches are essentially identical.  
+
+**(e)**  Run the `pairs` command on the following set of variables: EngineSize, MPG.highway, MPG.city and Horsepower.  Display correlations in the   Do you observe any collinearities?  
+
+```{r}
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(0, 1, 0, 1))
+    r <- abs(cor(x, y))
+    txt <- format(c(r, 0.123456789), digits = digits)[1]
+    txt <- paste0(prefix, txt)
+    if(missing(cex.cor)) cex.cor <- 0.4/strwidth(txt)
+    text(0.5, 0.5, txt, cex = pmax(1, cex.cor * r))
+}
+
+pairs(Cars93[,c("EngineSize", "MPG.highway", "MPG.city", "Horsepower")], 
+      lower.panel = panel.cor)
+```
+
+> The MPG.highway and MPG.city variables are very highly correlated.  
+
+**(f)** Use the `update` command to update your regression model to exclude `EngineSize` and `MPG.city`.  Display the resulting coefficients table nicely using the `kable()` command.
+
+```{r}
+cars.lm2 <- update(cars.lm, . ~ . - EngineSize - MPG.city)
+```
+
+```{r}
+kable(summary(cars.lm2)$coef, digits = c(3, 3, 3, 4), format = "markdown")
+```
+
+**(g)**  Does the coefficient of `MPG.highway` change much from the original model?  Calculate a 95% confidence interval and compare your answer to part (d).  Does the CI change much from before?  Explain.
+
+```{r}
+# old
+confint(cars.lm, parm = "MPG.highway")
+# new
+confint(cars.lm2, parm = "MPG.highway")
+```
+
+> Both the estimate and the confidence interval change greatly.  When we remove the highly collinear MPG.city variable from the model, the coefficient of MPG.highway increases (in magnitude).  We also get a much narrower confidence interval, indicating that we are able to more precisely estimate the coefficient of MPG.highway.  
+
+**(h)** Run the `plot` command on the linear model you constructed in part (f).  Do you notice any issues?
+
+```{r, fig.height = 12, fig.width = 12}
+par(mfrow = c(2, 2))
+plot(cars.lm2)
+```
+
+- Residual vs Fitted curve:  Shows some indication of non-linearity, but this could be a more of a non-constant variance issue.  
+- Normal QQ plot: Shows possible deviation in the upper tail.  Observation 59 is particularly worrisome.  Without this observation, there wouldn't be much of an issue.
+- Scale-Location plot: There's a discernible upward trend in the red trend line in this plot, which indicates possible non-constant (increasing) variance.  
+- Residual vs Leverage:  Observation 59 has very high residual, but not particularly high leverage.  

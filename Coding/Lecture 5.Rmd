@@ -1,0 +1,131 @@
+---
+title: 'Lecture 5: <br> Loops and some of their alternatives'
+author: "Dr. Osita Onyejekwe"
+date: "Fall 2020"
+output:
+  ioslides_presentation:
+    highlight: tango
+    widescreen: true
+    smaller: true
+---
+
+## Agenda
+
+- For/while loops to iterate over data
+- `apply`
+- `map`, `map_<type>`, `map_at`, `map_if`
+- `mutate_at`, `mutate_if`
+- `summarize_at`, `summarize_if`
+
+
+## Package and data loading
+```{r, message=FALSE, warning=FALSE}
+# Our favourite library
+library(tidyverse)
+
+# For Cars93 data again
+Cars93 <- MASS::Cars93 
+
+# For the clean survey data:
+survey <- read.csv("https://www.colorado.edu/amath/sites/default/files/attached-files/survey_data2020.txt
+", sep = "\t")  # use sep = "\t" when you save your file as .txt tab delimited 
+
+survey
+``` 
+
+## Example: apply()
+```{r}
+
+colMeans(fake.data)
+
+apply(fake.data, MARGIN=2, FUN=mean) # MARGIN = 1 for rows, 2 for columns
+
+# Function that calculates proportion of vector indexes that are > 0
+
+propPositive <- function(x) mean(x > 0)  # anything with "> 0", we are looking for positive values
+
+apply(fake.data, MARGIN=2, FUN=propPositive) 
+```
+
+## Example: map, map_<type>()
+```{r}
+
+map(survey, is.numeric) # return a list 
+
+map_lgl(survey, is.numeric)  # Returns a logical vector with named elements
+
+
+```
+
+## Example: apply(), map(), map_<type>()
+```{r}
+apply(cars, 2, FUN=mean)  # data frays are arrays
+
+map(cars, mean)   # Data frames are also lists 
+
+map_dbl(cars, mean)  # map output as a double vector 
+
+```
+
+## Example: mutate_if
+
+Let's convert all factor variables in Cars93 to lowercase
+
+```{r}
+
+```
+
+- Note: this has the effect of producing a copy of the `Cars93` data where all of the factor variables have been replaced with versions containing lowercase values
+
+## Example: mutate_if, adding instead of replacing columns
+
+If you pass the functions in as a list with named elements, those names get appended to create modified versions of variables instead of replacing existing variables
+
+```{r}
+
+```
+
+## Example: mutate_at
+
+Let's convert from MPG to KPML but this time using `mutate_at`
+```{r}
+
+```
+Here, ``    is an example of specifying a "lambda" (anonymous) function.  It is permitted short-hand for 
+
+```{r, eval = FALSE}
+```
+
+
+## Example: summarize_if
+
+Let's get the mean of every numeric column in Cars93
+
+```{r}
+
+```
+
+## Example: summarize_at
+
+Let's get the average fuel economy of all vehicles, grouped by their Type
+
+```{r}
+
+```
+
+## Another approach
+
+We'll learn about a bunch of select helper functions like `contains()` and `starts_with()`.  
+
+Here's one way of performing the previous operation with the help of these functions, and appending `_mean` to the resulting output. 
+
+```{r}
+
+```
+
+## More than one grouping variable
+
+```{r}
+
+```
+

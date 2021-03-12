@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/734738/ac13cdcf45a0410ca40916ccc0ad4fb4
+bundleId: https://api.rpubs.com/api/v1/document/734738/ac13cdcf45a0410ca40916ccc0ad4fb4
+url: http://rpubs.com/CU_BOULDER_APPM/734738
+when: 1615239824.67833

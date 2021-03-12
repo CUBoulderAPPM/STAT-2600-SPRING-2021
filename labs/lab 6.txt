@@ -1,0 +1,73 @@
+---
+title: "Lab 6"
+author: "Your Name Here"
+date: ""
+output: html_document
+---
+
+### Package loading
+
+```{r}
+library(tidyverse)
+```
+
+### Problems
+
+We'll begin by doing all the same data processing as in lecture.
+```{r}
+# Load data from MASS into a tibble
+birthwt <- as_tibble(MASS::birthwt)
+
+# Rename variables
+birthwt <- birthwt %>%
+  rename(birthwt.below.2500 = low, 
+         mother.age = age,
+         mother.weight = lwt,
+         mother.smokes = smoke,
+         previous.prem.labor = ptl,
+         hypertension = ht,
+         uterine.irr = ui,
+         physician.visits = ftv,
+         birthwt.grams = bwt)
+
+# Change factor level names
+birthwt <- birthwt %>%
+  mutate(race = recode_factor(race, `1` = "white", `2` = "black", `3` = "other")) %>%
+  mutate_at(c("mother.smokes", "hypertension", "uterine.irr", "birthwt.below.2500"),
+            ~ recode_factor(.x, `0` = "no", `1` = "yes"))
+```
+
+#### 1. Some table practice
+
+**(a)** Create a summary table showing the average birthweight (rounded to the nearest gram) grouped by race, mother's smoking status, and hypertension.
+
+```{r}
+# Edit me
+```
+
+**(b)** How many rows are there in the summary table?  Are all possible combinations of the three grouping variables shown?  Explain.
+
+
+> Your answer here
+
+<br>
+
+**(c)** Repeat part (b), this time adding the argument `.drop = FALSE` to your `group_by()` call.  What happens?
+
+```{r}
+# Edit me
+```
+
+#### 2. Plotting the diamonds data
+
+**(a)** Construct a violin plot of showing how the distribution of diamond prices varies by diamond `cut`.
+
+```{r}
+# Edit me
+```
+
+**(b)** Use `facet_grid` with `geom_historam` to construct 7 histograms showing the distribution of price within every category of diamond `color`. 
+
+```{r}
+# Edit me
+```

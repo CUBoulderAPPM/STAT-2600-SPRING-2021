@@ -1,0 +1,121 @@
+---
+title: "Lab 7 Solutions"
+author: "Osita Onyejekwe"
+date: ""
+output: html_document
+---
+
+##### Remember to change the `author: ` field on this Rmd file to your own name.
+
+We'll begin by loading all the packages we might need.
+```{r}
+library(tidyverse)
+Cars93 <- as_tibble(MASS::Cars93)
+```
+
+### Testing means between two groups
+
+Here is a command that generates density plots of `MPG.highway` from the Cars93 data.  Separate densities are constructed for US and non-US vehicles.  
+
+```{r}
+qplot(data = Cars93, x = MPG.highway, 
+      fill = Origin, geom = "density", alpha = I(0.5))
+```
+
+**(a)** Using the Cars93 data and the `t.test()` function, run a t-test to see if average `MPG.highway` is different between US and non-US vehicles.  *Interpret the results* 
+
+Try doing this both using the formula style input and the `x`, `y` style input.
+
+```{r}
+# Formula version
+mpg.t.test <- t.test(MPG.highway ~ Origin, data = Cars93)
+mpg.t.test
+
+# x, y version
+with(Cars93, t.test(x = MPG.highway[Origin == "USA"], y = MPG.highway[Origin == "non-USA"]))
+```
+
+There is no statistically significant difference in highway fuel consumption between US and non-US origin vehicles.
+
+**(b)** What is the confidence interval for the difference?
+
+```{r}
+mpg.t.test$conf.int
+```
+
+**(c)** Repeat part (a) using the `wilcox.test()` function.
+
+```{r}
+mpg.wilcox.test <- wilcox.test(MPG.highway ~ Origin, data = Cars93)
+mpg.wilcox.test
+```
+
+**(d)** Are your results for (a) and (c) very different?
+
+> The p-value from the t-test is somewhat smaller than that output by wilcox.test.  Since the MPG.highway distributions are right-skewed, we might expect some differences between the t-test and wilcoxon test  Neither test is statistically significant.  
+
+### Is the data normal?
+
+**(a)** Modify the density plot code provided in problem 1 to produce a plot with better axis labels.  Also add a title.
+
+```{r}
+qplot(data = Cars93, x = MPG.highway, 
+      fill = Origin, geom = "density", alpha = I(0.5),
+      xlab = "Highway fuel consumption (MPG)",
+      main = "Highway fuel consumption density plots")
+```
+
+
+**(b)** Does the data look to be normally distributed?
+
+> The densities don't really look normally distributed.  They appear right-skewed.   
+
+**(c)** Construct qqplots of `MPG.highway`, one plot for each `Origin` category.  Overlay a line on each plot using with `qqline()` function.
+
+```{r, fig.height = 4}
+par(mfrow = c(1,2))
+# USA cars
+with(Cars93, qqnorm(MPG.highway[Origin == "USA"]))
+with(Cars93, qqline(MPG.highway, col = "blue"))
+# Foreign cars
+with(Cars93, qqnorm(MPG.highway[Origin == "non-USA"]))
+with(Cars93, qqline(MPG.highway, col = "blue"))
+```
+
+**(d)** Does the data look to be normally distributed?
+
+The non-USA MPG.highway data looks quite far from normally distributed.  This distribution appears to have a heavier upper tail.
+
+### Testing 2 x 2 tables
+
+Doll and Hill's 1950 article studying the association between smoking and lung cancer contains one of the most important 2 x 2 tables in history.  
+
+Here's their data:
+
+```{r}
+smoking <- as.table(rbind(c(688, 650), c(21, 59)))
+dimnames(smoking) <- list(has.smoked = c("yes", "no"),
+                    lung.cancer = c("yes","no"))
+smoking
+```
+
+**(a)** Use `fisher.test()` to test if there's an association between smoking and lung cancer.
+
+```{r}
+smoking.fisher.test <- fisher.test(smoking)
+smoking.fisher.test
+```
+
+**(b)** What is the odds ratio?
+
+```{r}
+smoking.fisher.test$estimate
+```
+
+**(c)** Are your findings significant?
+
+```{r}
+smoking.fisher.test$p.value
+```
+
+The findings are highly significant.

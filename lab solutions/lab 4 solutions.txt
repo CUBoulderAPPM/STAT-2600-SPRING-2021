@@ -1,0 +1,90 @@
+---
+title: "Lab 4 Solution"
+author: "Osita Onyejekwe"
+date: ""
+output: html_document
+---
+
+##### Remember to change the `author: ` field on this Rmd file to your own name.
+
+```{r}
+library(tidyverse)
+Cars93 <- MASS::Cars93
+```
+
+#### 1. Loop practice
+
+**(a)** Write a function called `calculateRowMeans` that uses a **for loop** to calculate the row means of a matrix `x`.
+
+```{r}
+# calculateRowMeans computes the row means of a matrix x
+# input: matrix x
+# output: vector of length nrow(x) giving row means of x
+calculateRowMeans <- function(x) {
+  row.means <- numeric(nrow(x))
+  for(i in 1:nrow(x)) {
+    row.means[i] <- mean(x[i,])
+  }
+  row.means
+}
+
+```
+
+**(b)** Try out your function on the random matrix `fake.data` defined below.
+
+```{r}
+set.seed(12345) # Set seed of random number generator
+fake.data <- matrix(runif(800), nrow=25)
+calculateRowMeans(fake.data)
+```
+
+**(c)** Use the `apply()` function to calculate the row means of the matrix `fake.data`
+
+```{r}
+apply(fake.data, MARGIN=1, FUN=mean)
+```
+
+**(d)** Compare this to the output of the `rowMeans()` function to check that your calculation is correct.
+
+```{r}
+identical(calculateRowMeans(fake.data), apply(fake.data, MARGIN=1, FUN=mean))
+```
+
+### 2. summarize() practice
+
+**(a)** Use `group_by()` and  `summarize()` commands on the Cars93 data set to create a table showing the average `Turn.circle` of cars, broken down by vehicle `Type` and `DriveTrain`
+
+```{r}
+Cars93 %>%
+  group_by(Type, DriveTrain) %>%
+  summarize(mean(Turn.circle))
+```
+
+
+**(b)** Are all combinations of Type and DriveTrain shown in the table?  If not, which ones are missing?  Why are they missing?
+
+> Some are missing.  E.g., there is no entry for Large 4WD cars.  This is because there are no vehicles in this category.
+
+```{r}
+sum(Cars93$Type == "Large" & Cars93$DriveTrain == "4WD")
+```
+
+**(c)** Add the argument `.drop = FALSE` to your `group_by` command, and then re-run your code. What happens now?
+
+```{r}
+Cars93 %>%
+  group_by(Type, DriveTrain, .drop = FALSE) %>%
+  summarize(mean(Turn.circle))
+```
+
+
+> The `.drop` argument, which is set to `TRUE` by default, controls whether variable combinatinos that never appear together are dropped.  When we set `.drop = FALSE` the combinations with 0 counts still appear in the table, but the summary shows `NaN` in that cell (not a number).
+
+**(d)** Having a car with a small turn radius makes city driving much easier.  What Type of car should city drivers opt for?
+
+
+> Small cars appear to have smaller turn radii.  
+
+**(e)** Does the vehicle's `DriveTrain` appear to have an impact on turn radius?  
+
+> There is no consistent association.

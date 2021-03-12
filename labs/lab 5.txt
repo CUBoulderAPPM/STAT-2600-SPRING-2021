@@ -1,0 +1,74 @@
+---
+title: "Lab 5"
+author: "Your Name Here"
+output: html_document
+---
+
+##### Remember to change the `author: ` field on this Rmd file to your own name.
+
+### Learning objectives
+
+> In today's Lab you will gain practice with the following concepts from Lecture 5:
+
+- Using `apply` and `map` as loop alternatives
+- Using the various **`mutate`** commands to manipulate data
+- Using the various **`summarize`** commands to produce simple tabular summaries, and interpreting the results
+
+## Problems
+
+```{r}
+library(tidyverse)
+Cars93 <- as_tibble(MASS::Cars93)  # Pull Cars93 from MASS
+```
+
+### 1. map() practice
+
+> Note: This question previously (accidentally) appeared on Lab 4.  Feel free to skip it if you already succeeded on this question in the previous week.
+
+**(a)** The `nlevels` command tells you the number of levels in a factor variable.  Use this function in combination with `summarize_if()` to produce an integer vector showing the number of levels for each factor variables in the Cars93 data.
+
+```{r}
+# Edit me
+```
+
+**(b)** `levels()` returns the possible levels of a factor variable. Use this function in combination with `select` and `map` to create a list of all the levels of the Manufacturer, AirBags, DriveTrain, and Man.trans.avail variables
+
+```{r}
+# Edit me
+```
+
+
+### 2. `mutate()` variants with Cars93
+
+**(a)** Use the `toupper()` command in combination with `mutate_if()` to produce a new version of Cars93 where every factor variable has been converted to upper case.  
+
+```{r}
+# Edit me
+```
+
+**(b)** Currently the price columns of the `Cars93` reflect prices in $1000's of dollars.  Use `mutate_at` to create a version of `Cars93` where all prices are in $'s.  (e.g., what used to be a price of 12.9 should become 12900).  
+
+```{r}
+# Edit me
+```
+
+**(c)** Use `mutate_if` to normalize all of the **numeric** variables in the `Cars93` data to have variance 1.  Save the resulting mutated data in a variable called `Cars93.norm`.  (Hint: this is equivalent to dividing each of the columns by the standard deviation of the given column.)
+
+```{r}
+# Edit me
+```
+
+To check that you've succeeded, you can confirm that the following lines of code all return the answer `1`.
+
+```{r, eval = FALSE}
+var(Cars93.norm$Min.Price)
+var(Cars93.norm$Horsepower)
+```
+
+### 3. `summarize()` variants
+
+Use `summarize_if` to calculate the standard deviation of every numeric column in the original `Cars93` data.  You'll want to further specify `na.rm = TRUE` to ensure that you get a non-`NA` output value even for variables that have some missing (`NA`) observations.  
+
+```{r}
+# Edit me
+```

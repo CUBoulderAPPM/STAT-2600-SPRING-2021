@@ -1,0 +1,226 @@
+# Homework 2
+## Author: 
+## Date: 
+
+##### Remember to change the `author: ` field on this Rmd file to your own name.
+
+### Problem 1: table(), tapply()
+
+We'll start by downloading a publicly available dataset that contains some census data information.  This dataset is called `income`.
+
+
+
+```{R}
+# Import data file
+
+income <- read.csv("https://www.colorado.edu/amath/sites/default/files/attached-files/income_data.txt"
+, header = FALSE)
+
+# Give variables names
+colnames(income) <- c("age", "workclass", "fnlwgt", "education", "education.years", "marital.status", "occupation", "relationship", "race", "sex", "capital.gain", "capital.loss", "hours.per.week", "native.country", "income.bracket")
+
+```
+
+##### (a) table()
+
+Use the `table()` function to produce a contingency table of observation counts across **marital status** and **sex**.
+
+
+```{R}
+#Edit here
+```
+
+##### (b)  The `prop.table()` 
+This function calculates a table of proportions from a table of counts.  Read the documentation for this function to see how it works.  Use `prop.table()` and your table from problem **(a)** to form a (column) proportions table.  The Female column of the table should show the proportion of women in each marital status category.  The Male column will show the same, but for men.
+
+
+```{R}
+#Edit here
+```
+
+##### (c)  Use part (b) to answer the following questions.   
+In this data set, are women more or less likely than men to be married?  Are women more or less likely to be Widowed?  (As part of your answer, calculate the % of individuals in each group who report being married, and the % who report being widowed.  Use inline code chunks when reporting these values.)
+
+
+Replace this text with your answer.
+
+##### (d) tapply()
+
+Use the `tapply()` function to produce a table showing the average **education** (in years) across **marital status** and **sex** categories.
+
+
+
+```{R}
+#Edit here
+```
+
+### Problem 2: A more complex `tapply()` example (calculating Claims per Holder)
+
+The `MASS` package contains a dataset called Insurance.  Read the help file on this data set to understand its contents.
+
+
+##### (a) Total number of Holders by District and Age
+
+Use the `tapply()` function to produce a table showing the total number of Holders across District and Age.  Save this table in a variable, and also display your answer.
+
+
+
+```{R}
+#Edit here
+```
+
+##### (b) Total number of Claims by District and Age
+
+Use the `tapply()` function to produce a table showing the total number of Claims across District and Age  Save this table in a variable, and also display your answer.
+
+
+
+```{R}
+#Edit here
+```
+
+##### (c) Rate of Claims per Holder by District and Age
+
+Use your answers from parts **(a)** and **(b)** to produce a table that shows the rate of Claims per Holder across District and Age. 
+
+
+
+```{R}
+#Edit here
+```
+
+
+**Tip:** *If an insurance company has 120,000 policy holders and receives 14,000 claims, the rate of claims per holder is 14000/120000 = `r round(14000/120000,3) `*
+
+
+##### (d) Do you observe any trends in how the number of claims per holder varies with age?  
+
+Replace this text with your answer.
+
+### Problem 3: Someone left strings in your numeric column!
+
+This exercise will give you practice with two of the most common data cleaning tasks.  For this problem we'll use the `survey_untidy.txt` data set posted on my personal APPM website..  Begin by importing this data into R.  The url for the data set is shown below.
+
+
+url: https://www.colorado.edu/amath/sites/default/files/attached-files/survey_untidy1.txt
+
+
+In Lecture 4 we look at an example of cleaning up the TVhours column.  The TVhours column of `survey_untidy.txt` has been corrupted in a similar way to what you saw in class.  
+
+Using the techniques you saw in class, make a new version of the untidy survey data where the TVhours column has been cleaned up. (Hint: *you may need to handle some of the observations on a case-by-case basis*)
+
+
+
+```{R}
+#Edit here
+```
+
+### Problem 4: Shouldn't ppm, pPM and PPM all be the same thing?
+
+This exercise picks up from Problem 3, and walks you through two different approaches to cleaning up the Program column
+
+
+##### (a) Identifying the problem.
+
+Use the `table` or `levels` command on the Program column to figure out what went wrong with this column.  Describe the problem in the space below.
+
+
+
+```{R}
+#Edit here
+```
+
+##### (b) `mapvalues` approach
+
+Starting with the cleaned up data you produced in Problem 3, use the `mapvalues` and `mutate` functions to fix the Program column by mapping all of the lowercase and mixed case program names to upper case.  
+
+
+```{R}
+library(plyr)
+library(dplyr)
+
+#Edit here
+```
+
+##### (c) `toupper` approach
+
+The `toupper` function takes an array of character strings and converts all letters to uppercase.
+
+Use `toupper()` and `mutate` to perform the same data cleaning task as in part (b).  
+
+
+```{R}
+#Edit here
+```
+
+**Tip**: *The `toupper()` and `tolower()` functions are very useful in data cleaning tasks.  You may want to start by running these functions even if you'll have to do some more spot-cleaning later on.*
+
+### Problem 5: Let's apply some functions
+
+##### (a) Writing trimmed mean function
+
+Write a function that calculates the mean of a numeric vector `x`, ignoring the `s` smallest and `l` largest values (this is a *trimmed mean*).  
+
+E.g., if `x = c(1, 7, 3, 2, 5, 0.5, 9, 10)`, `s = 1`, and `l = 2`, your function would return the mean of `c(1, 7, 3, 2, 5)` (this is `x` with the 1 smallest value (0.5) and the 2 largest values (9, 10) removed).
+
+Your function should use the `length()` function to check if `x` has at least `s + l + 1` values.  If `x` is shorter than `s + l + 1`, your function should use the `message()` function to tell the user that the vector can't be trimmed as requested.  If `x` is at least length `s + l + 1`, your function should return the trimmed mean.
+
+
+```{R}
+# Here's a function skeleton to get you started
+
+# Fill me in with an informative comment
+# describing what the function does
+
+trimmedMean <- function(x, s = 0, l = 0) {
+  # Write your code here
+}
+```
+
+**Hint:** *For this exercise it will be useful to recall the `sort()` function that you first saw in Lecture 1.*
+
+**Note:** The `s = 0` and `l = 0` specified in the function definition are the default settings.  i.e., this syntax ensures that if `s` and `l` are not provided by the user, they are both set to `0`.  Thus the default behaviour is that the `trimmedMean` function doesn't trim anything, and hence is the same as the `mean` function.  
+
+##### (b) Apply your function with a for loop
+
+
+```{R}
+set.seed(201802) # Sets seed to make sure everyone's random vectors are generated the same
+list.random <- list(x = rnorm(50), 
+                    y = rexp(65),
+                    z = rt(100, df = 1.5))
+
+# Here's a Figure showing histograms of the data
+par(mfrow = c(1,3))
+hist(list.random$x, breaks = 15, col = 'grey')
+hist(list.random$y, breaks = 10, col = 'forestgreen')
+hist(list.random$z, breaks = 20, col = 'steelblue')
+```
+
+Using a `for loop` and your function from part **(a)**, create a vector whose elements are the trimmed means of the vectors in `list.random`, taking `s = 5` and `l = 5`. 
+
+
+
+```{R}
+#Edit here
+```
+
+##### (c) Calculate the un-trimmed means for each of the vectors in the list.  How do these compare to the trimmed means you calculated in part (b)?  Explain your findings.  
+
+
+
+```{R}
+#Edit here
+```
+
+##### (d) lapply(), sapply()
+
+Repeat part **(b)**, using the `lapply` and `sapply` functions instead of a for loop.  Your `lapply` command should return a list of trimmed means, and your `sapply` command should return a vector of trimmed means.
+
+
+
+```{R}
+#Edit here
+```
+
+**Hint** `lapply` and `sapply` can take arguments that you wish to pass to the `trimmedMean` function.  E.g., if you were applying the function `sort`, which has an argument `decreasing`, you could use the syntax `lapply(..., FUN = sort, decreasing = TRUE)`.
